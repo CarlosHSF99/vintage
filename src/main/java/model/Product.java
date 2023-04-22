@@ -14,7 +14,6 @@ public abstract class Product {
     private String brand;
     private BigDecimal basePrice;
     private int numberOfPreviousOwners;
-    private int state;
     private ShippingCompany shippingCompany;
 
     /**
@@ -25,17 +24,15 @@ public abstract class Product {
      * @param brand                  Product brand
      * @param basePrice              Product base price
      * @param numberOfPreviousOwners Product number of previous owners
-     * @param state                  Product state
      * @param shippingCompany        Product assigned shipping company
      */
-    public Product(String seller, String description, String brand, String basePrice,int numberOfPreviousOwners, int state, ShippingCompany shippingCompany) {
+    public Product(String seller, String description, String brand, String basePrice,int numberOfPreviousOwners, ShippingCompany shippingCompany) {
         this.code = nextAlphanumericCode();
         this.seller = seller;
         this.description = description;
         this.brand = brand;
         this.basePrice = new BigDecimal(basePrice);
         this.numberOfPreviousOwners = numberOfPreviousOwners;
-        this.state = state;
         this.shippingCompany = shippingCompany;
     }
 
@@ -51,7 +48,6 @@ public abstract class Product {
         this.brand = other.brand;
         this.basePrice = other.basePrice;
         this.numberOfPreviousOwners = other.numberOfPreviousOwners;
-        this.state = other.state;
         this.shippingCompany = other.shippingCompany;
     }
 
@@ -97,14 +93,6 @@ public abstract class Product {
 
     public void incrementNumberOfPreviousOwners() {
         numberOfPreviousOwners++;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
     }
 
     public ShippingCompany getShippingCompany() {
@@ -154,7 +142,6 @@ public abstract class Product {
                 ", brand='" + brand + '\'' +
                 ", basePrice=" + basePrice +
                 ", numberOfPreviousOwners=" + numberOfPreviousOwners +
-                ", state=" + state +
                 ", shippingCompany=" + shippingCompany;
     }
 
@@ -166,7 +153,6 @@ public abstract class Product {
         Product product = (Product) o;
 
         if (numberOfPreviousOwners != product.numberOfPreviousOwners) return false;
-        if (state != product.state) return false;
         if (!code.equals(product.code)) return false;
         if (!seller.equals(product.seller)) return false;
         if (!description.equals(product.description)) return false;
@@ -183,7 +169,6 @@ public abstract class Product {
         result = 31 * result + brand.hashCode();
         result = 31 * result + basePrice.hashCode();
         result = 31 * result + numberOfPreviousOwners;
-        result = 31 * result + state;
         result = 31 * result + shippingCompany.hashCode();
         return result;
     }

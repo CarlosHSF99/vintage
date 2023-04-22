@@ -1,0 +1,4 @@
+rootProject.name = 'vintage'
+include 'src:main:model'
+findProject(':src:main:model')?.name = 'model'
+

@@ -23,7 +23,7 @@ public class TShirt extends Product {
      * @param pattern                TShirt pattern
      */
     public TShirt(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, int state, ShippingCompany shippingCompany, Size size, Pattern pattern) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, false, shippingCompany);
+        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
         this.size = size;
         this.pattern = pattern;
     }

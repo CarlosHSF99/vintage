@@ -13,7 +13,7 @@ class ProductTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product("seller", "", "", "1.0", 0, 0, false, null) {
+        product = new Product("seller", "", "", "1.0", 0, 0, null) {
             @Override
             public BigDecimal priceCorrection() {
                 return null;
@@ -79,14 +79,6 @@ class ProductTest {
         var state = 5;
         product.setState(state);
         assertEquals(state, product.getState());
-    }
-
-    @Test
-    void setAndIsPremium() {
-        product.setPremium(false);
-        assertFalse(product.isPremium());
-        product.setPremium(true);
-        assertTrue(product.isPremium());
     }
 
     @Test

@@ -23,3 +23,7 @@ jar {
         attributes 'Main-Class': 'Main'
     }
 }
+
+apply plugin: 'application'
+
+mainClassName = 'Main'

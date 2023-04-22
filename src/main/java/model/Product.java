@@ -151,12 +151,17 @@ public abstract class Product {
     /**
      * Checks if the Product is used.
      *
-     * @return Returns whether the Product is used.
+     * @return Returns whether the Product is used
      */
     public boolean isUsed() {
         return numberOfPreviousOwners > 0;
     }
 
+    /**
+     * Returns the price of the Product as a BigDecimal.
+     *
+     * @return Price of Product as a BigDecimal
+     */
     public abstract BigDecimal price();
 
     private String nextAlphanumericCode() {

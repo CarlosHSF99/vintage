@@ -57,6 +57,11 @@ public class TShirt extends Product {
         this.pattern = pattern;
     }
 
+    /**
+     * Returns the price of the TShirt as a BigDecimal
+     *
+     * @return Price of TShirt as a BigDecimal
+     */
     @Override
     public BigDecimal price() {
         BigDecimal discount = getPriceCorrection().add(isUsed() ? pattern.getValue() : BigDecimal.ZERO);

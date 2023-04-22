@@ -16,16 +16,14 @@ public class TShirt extends Product {
      * @param description            TShirt description
      * @param brand                  TShirt brand
      * @param basePrice              TShirt base price
-     * @param priceCorrection        TShirt price correction
      * @param numberOfPreviousOwners TShirt number of previous owners
      * @param state                  TShirt state
-     * @param premium                TShirt premium status
      * @param shippingCompany        TShirt assigned shipping company
      * @param size                   TShirt size
      * @param pattern                TShirt pattern
      */
-    public TShirt(String seller, String description, String brand, String basePrice, String priceCorrection, int numberOfPreviousOwners, int state, boolean premium, ShippingCompany shippingCompany, Size size, Pattern pattern) {
-        super(seller, description, brand, basePrice, priceCorrection, numberOfPreviousOwners, state, premium, shippingCompany);
+    public TShirt(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, int state, ShippingCompany shippingCompany, Size size, Pattern pattern) {
+        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, false, shippingCompany);
         this.size = size;
         this.pattern = pattern;
     }
@@ -57,6 +55,10 @@ public class TShirt extends Product {
         this.pattern = pattern;
     }
 
+    public BigDecimal priceCorrection() {
+        return isUsed() ? pattern.getValue() : BigDecimal.ZERO;
+    }
+
     /**
      * Returns the price of the TShirt as a BigDecimal
      *
@@ -64,11 +66,7 @@ public class TShirt extends Product {
      */
     @Override
     public BigDecimal price() {
-        BigDecimal discount = getPriceCorrection().add(isUsed() ? pattern.getValue() : BigDecimal.ZERO);
-        if (discount.compareTo(BigDecimal.ONE) >= 0) {
-            return BigDecimal.ZERO;
-        }
-        return getBasePrice().multiply(BigDecimal.ONE.subtract(discount));
+        return getBasePrice().multiply(BigDecimal.ONE.subtract(priceCorrection()));
     }
 
     @Override

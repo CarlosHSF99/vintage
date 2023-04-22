@@ -13,7 +13,6 @@ public abstract class Product {
     private String description;
     private String brand;
     private BigDecimal basePrice;
-    private BigDecimal priceCorrection;
     private int numberOfPreviousOwners;
     private int state;
     private boolean premium;
@@ -26,19 +25,17 @@ public abstract class Product {
      * @param description            Product description
      * @param brand                  Product brand
      * @param basePrice              Product base price
-     * @param priceCorrection        Product price correction
      * @param numberOfPreviousOwners Product number of previous owners
      * @param state                  Product state
      * @param premium                Product premium status
      * @param shippingCompany        Product assigned shipping company
      */
-    public Product(String seller, String description, String brand, String basePrice, String priceCorrection, int numberOfPreviousOwners, int state, boolean premium, ShippingCompany shippingCompany) {
+    public Product(String seller, String description, String brand, String basePrice,int numberOfPreviousOwners, int state, boolean premium, ShippingCompany shippingCompany) {
         this.code = nextAlphanumericCode();
         this.seller = seller;
         this.description = description;
         this.brand = brand;
         this.basePrice = new BigDecimal(basePrice);
-        this.priceCorrection = new BigDecimal(priceCorrection);
         this.numberOfPreviousOwners = numberOfPreviousOwners;
         this.state = state;
         this.premium = premium;
@@ -56,7 +53,6 @@ public abstract class Product {
         this.description = other.description;
         this.brand = other.brand;
         this.basePrice = other.basePrice;
-        this.priceCorrection = other.priceCorrection;
         this.numberOfPreviousOwners = other.numberOfPreviousOwners;
         this.state = other.state;
         this.premium = other.premium;
@@ -93,14 +89,6 @@ public abstract class Product {
 
     public void setBasePrice(String basePrice) {
         this.basePrice = new BigDecimal(basePrice);
-    }
-
-    public BigDecimal getPriceCorrection() {
-        return priceCorrection;
-    }
-
-    public void setPriceCorrection(String priceCorrection) {
-        this.priceCorrection = new BigDecimal(priceCorrection);
     }
 
     public int getNumberOfPreviousOwners() {
@@ -157,6 +145,8 @@ public abstract class Product {
         return numberOfPreviousOwners > 0;
     }
 
+    public abstract BigDecimal priceCorrection();
+
     /**
      * Returns the price of the Product as a BigDecimal.
      *
@@ -175,7 +165,6 @@ public abstract class Product {
                 ", description='" + description + '\'' +
                 ", brand='" + brand + '\'' +
                 ", basePrice=" + basePrice +
-                ", priceCorrection=" + priceCorrection +
                 ", numberOfPreviousOwners=" + numberOfPreviousOwners +
                 ", state=" + state +
                 ", premium=" + premium +
@@ -197,7 +186,6 @@ public abstract class Product {
         if (!description.equals(product.description)) return false;
         if (!brand.equals(product.brand)) return false;
         if (!basePrice.equals(product.basePrice)) return false;
-        if (!priceCorrection.equals(product.priceCorrection)) return false;
         return shippingCompany.equals(product.shippingCompany);
     }
 
@@ -208,7 +196,6 @@ public abstract class Product {
         result = 31 * result + description.hashCode();
         result = 31 * result + brand.hashCode();
         result = 31 * result + basePrice.hashCode();
-        result = 31 * result + priceCorrection.hashCode();
         result = 31 * result + numberOfPreviousOwners;
         result = 31 * result + state;
         result = 31 * result + (premium ? 1 : 0);

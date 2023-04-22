@@ -13,7 +13,12 @@ class ProductTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product("seller", "", "", "1.0", "0.25", 0, 0, false, null) {
+        product = new Product("seller", "", "", "1.0", 0, 0, false, null) {
+            @Override
+            public BigDecimal priceCorrection() {
+                return null;
+            }
+
             @Override
             public BigDecimal price() {
                 return null;
@@ -34,6 +39,7 @@ class ProductTest {
     void getCode() {
     }
 
+    @Test
     void getSeller() {
         assertEquals("seller", product.getSeller());
     }
@@ -57,13 +63,6 @@ class ProductTest {
         var basePrice = "1.0";
         product.setBasePrice(basePrice);
         assertEquals(new BigDecimal(basePrice), product.getBasePrice());
-    }
-
-    @Test
-    void setAndGetPriceCorrection() {
-        var priceCorrection = "0.25";
-        product.setBrand(priceCorrection);
-        assertEquals(new BigDecimal(priceCorrection), product.getPriceCorrection());
     }
 
     @Test

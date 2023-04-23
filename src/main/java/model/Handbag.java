@@ -49,12 +49,7 @@ public class Handbag extends Product {
 
     @Override
     public BigDecimal priceCorrection() {
-        return BigDecimal.ONE.divide(new BigDecimal(dimension), 2, RoundingMode.HALF_EVEN);
-    }
-
-    @Override
-    public BigDecimal price() {
-        return getBasePrice().multiply(BigDecimal.ONE.subtract(priceCorrection()));
+        return BigDecimal.ONE.add(BigDecimal.ONE.divide(new BigDecimal(dimension), 2, RoundingMode.HALF_EVEN));
     }
 
     @Override

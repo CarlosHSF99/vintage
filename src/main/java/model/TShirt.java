@@ -55,17 +55,7 @@ public class TShirt extends Product {
     }
 
     public BigDecimal priceCorrection() {
-        return isUsed() ? pattern.getValue() : BigDecimal.ZERO;
-    }
-
-    /**
-     * Returns the price of the TShirt as a BigDecimal
-     *
-     * @return Price of TShirt as a BigDecimal
-     */
-    @Override
-    public BigDecimal price() {
-        return getBasePrice().multiply(BigDecimal.ONE.subtract(priceCorrection()));
+        return isUsed() ? pattern.getValue() : BigDecimal.ONE;
     }
 
     @Override
@@ -103,7 +93,7 @@ public class TShirt extends Product {
     }
 
     enum Pattern {
-        PLAIN("0.0"), STRIPES("0.5"), PALM_TREES("0.5");
+        PLAIN("1.0"), STRIPES("0.5"), PALM_TREES("0.5");
 
         private final BigDecimal value;
 

@@ -27,17 +27,7 @@ public class PremiumHandbag extends Handbag implements Premium {
 
     @Override
     public BigDecimal priceCorrection() {
-        BigDecimal appreciation = type.getAppreciationRate();
-        long year = getCollectionYear().until(Year.now(), ChronoUnit.YEARS);
-        for (int i = 0; i < year; i++) {
-            appreciation = appreciation.add(appreciation.multiply(type.getAppreciationRate()));
-        }
-        return super.priceCorrection().subtract(appreciation);
-    }
-
-    @Override
-    public BigDecimal price() {
-        return getBasePrice().multiply(BigDecimal.ONE.subtract(priceCorrection()));
+        return super.priceCorrection().multiply(type.getAppreciationRate().pow((int) getCollectionYear().until(Year.now(), ChronoUnit.YEARS)));
     }
 
     @Override
@@ -64,7 +54,7 @@ public class PremiumHandbag extends Handbag implements Premium {
     }
 
     enum Type {
-        DESIGNER("0.2"), LUXURY_LEATHER("0.15"), VEGAN_LEATHER("0.1");
+        DESIGNER("1.2"), LUXURY_LEATHER("1.15"), VEGAN_LEATHER("1.1");
 
         private final BigDecimal appreciationRate;
 

@@ -56,17 +56,17 @@ class TShirtTest {
 
     @Test
     void correctionPriceOfNewPlainShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(newPlainTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(newPlainTShirt.priceCorrection()));
     }
 
     @Test
     void correctionPriceOfUsedPlainShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(usedPlainTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(usedPlainTShirt.priceCorrection()));
     }
 
     @Test
     void correctionPriceOfNewStripesShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(newStripesTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(newStripesTShirt.priceCorrection()));
     }
 
     @Test
@@ -76,7 +76,7 @@ class TShirtTest {
 
     @Test
     void correctionPriceOfNewPalmTreesShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(newPalmTreesTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(newPalmTreesTShirt.priceCorrection()));
     }
 
     @Test

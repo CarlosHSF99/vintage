@@ -133,6 +133,12 @@ public abstract class Product {
         return numberOfPreviousOwners > 0;
     }
 
+    /**
+     * Returns the price correction of the Product as a BigDecimal.
+     * The price method calculates the final price of a Product by multiplying its basePrice by the return value of this method.
+     *
+     * @return Price correction of Product as a BigDecimal
+     */
     public abstract BigDecimal priceCorrection();
 
     /**
@@ -140,7 +146,9 @@ public abstract class Product {
      *
      * @return Price of Product as a BigDecimal
      */
-    public abstract BigDecimal price();
+    public BigDecimal price() {
+        return basePrice.multiply(priceCorrection());
+    }
 
     private String nextAlphanumericCode() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');

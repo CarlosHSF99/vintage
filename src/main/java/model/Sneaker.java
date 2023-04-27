@@ -1,6 +1,9 @@
 package model;
 
 import java.math.BigDecimal;
+import java.time.Year;
+import java.awt.Color;
+import java.util.Objects;
 
 /**
  * Sneaker class
@@ -51,7 +54,7 @@ public class Sneaker extends Product {
         this.discount = other.discount;
     }
 
-    public int getSize(){
+    public int getSize() {
         return size;
     }
 
@@ -59,7 +62,7 @@ public class Sneaker extends Product {
         this.size = size;
     }
 
-    public Color getColor(){
+    public Color getColor() {
         return color;
     }
 
@@ -67,7 +70,7 @@ public class Sneaker extends Product {
         this.color = color;
     }
 
-    public boolean hasLaces(){
+    public boolean hasLaces() {
         return laces;
     }
 
@@ -75,15 +78,15 @@ public class Sneaker extends Product {
         this.laces = laces;
     }
 
-    public int getCollectionYear(){
+    public Year getCollectionYear() {
         return collectionYear;
     }
 
-    public void setCollectionYear(int collectionYear) {
+    public void setCollectionYear(Year collectionYear) {
         this.collectionYear = collectionYear;
     }
 
-    public BigDecimal getDiscount(){
+    public BigDecimal getDiscount() {
         return discount;
     }
 
@@ -92,13 +95,11 @@ public class Sneaker extends Product {
     }
 
     public BigDecimal priceCorrection() {
-        if isUsed(){
+        if (isUsed()) {
             // desconto de ser usado
-        }
-        else if(size>45){ //nova mas tamanho > 45
+        } else if (size > 45) { //nova mas tamanho > 45
             // desconto do tamanho
-        }
-        else return BigDecimal.ZERO;
+        } else return BigDecimal.ZERO;
     }
 
     /**
@@ -113,14 +114,7 @@ public class Sneaker extends Product {
 
     @Override
     public String toString() {
-        return "Sneaker{" +
-                super.toString() +
-                ", size=" + size +
-                ", color=" + color +
-                ", laces=" + laces +
-                ", collectionYear=" + collectionYear +
-                ", discount=" + discount +
-                "}";
+        return "Sneaker{" + super.toString() + ", size=" + size + ", color=" + color + ", laces=" + laces + ", collectionYear=" + collectionYear + ", discount=" + discount + "}";
     }
 
     @Override
@@ -132,20 +126,20 @@ public class Sneaker extends Product {
         Sneaker sneaker = (Sneaker) o;
 
         if (size != sneaker.size) return false;
-        if (color != sneaker.color) return false;
-        if (collectionYear != sneaker.collectionYear) return false;
         if (laces != sneaker.laces) return false;
-        return discount == sneaker.discount;
+        if (!Objects.equals(color, sneaker.color)) return false;
+        if (!Objects.equals(collectionYear, sneaker.collectionYear)) return false;
+        return Objects.equals(discount, sneaker.discount);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + size.hashCode();
-        result = 31 * result + color.hashCode();
-        result = 31 * result + laces.hashCode();
-        result = 31 * result + collectionYear.hashCode();
-        result = 31 * result + discount.hashCode();
+        result = 31 * result + size;
+        result = 31 * result + (color != null ? color.hashCode() : 0);
+        result = 31 * result + (laces ? 1 : 0);
+        result = 31 * result + (collectionYear != null ? collectionYear.hashCode() : 0);
+        result = 31 * result + (discount != null ? discount.hashCode() : 0);
         return result;
     }
 

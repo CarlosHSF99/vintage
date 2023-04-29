@@ -90,4 +90,18 @@ public class Handbag extends Product {
     public Handbag clone() {
         return new Handbag(this);
     }
+
+    enum Material {
+        CANVAS,
+        COTTON,
+        DENIM,
+        FABRIC,
+        LEATHER,
+        NYLON,
+        RAFFIA,
+        STRAW,
+        VEGAN_LEATHER,
+        VELVET,
+        VINYL,
+    }
 }

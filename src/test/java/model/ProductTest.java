@@ -13,7 +13,7 @@ class ProductTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product("seller", "", "", "1.0", 0, null) {
+        product = new Product("seller", "", "", "1.0", 0, Product.State.GOOD, null) {
             @Override
             public BigDecimal priceCorrection() {
                 return null;
@@ -72,6 +72,13 @@ class ProductTest {
         assertEquals(numberOfPreviousOwners, product.getNumberOfPreviousOwners());
         product.incrementNumberOfPreviousOwners();
         assertEquals(numberOfPreviousOwners + 1, product.getNumberOfPreviousOwners());
+    }
+
+    @Test
+    void setAndGetState() {
+        Product.State state = Product.State.NEW_WITH_TAG;
+        product.setState(state);
+        assertEquals(state, product.getState());
     }
 
     @Test

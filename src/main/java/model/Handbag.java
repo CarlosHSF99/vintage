@@ -9,8 +9,8 @@ public class Handbag extends Product {
     private String material;
     private Year collectionYear;
 
-    public Handbag(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, ShippingCompany shippingCompany, double dimension, String material, Year collectionYear) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, shippingCompany);
+    public Handbag(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, double dimension, String material, Year collectionYear) {
+        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
         this.dimension = dimension;
         this.material = material;
         this.collectionYear = collectionYear;
@@ -49,7 +49,10 @@ public class Handbag extends Product {
 
     @Override
     public BigDecimal priceCorrection() {
-        return BigDecimal.ONE.add(BigDecimal.ONE.divide(new BigDecimal(dimension), 2, RoundingMode.HALF_EVEN));
+        var r = BigDecimal.ONE.subtract(BigDecimal.ONE.divide(new BigDecimal(dimension), 2, RoundingMode.HALF_EVEN));
+        if (r.compareTo(BigDecimal.valueOf(0.5)) < 0)
+            r = new BigDecimal("0.5");
+        return r;
     }
 
     @Override

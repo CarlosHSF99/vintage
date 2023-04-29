@@ -14,7 +14,7 @@ class HandbagTest {
 
     @BeforeEach
     void setUp() {
-        handbag = new Handbag("seller", "description", "brand", "1", 0, null, 1.0, "stone", Year.of(2020));
+        handbag = new Handbag("seller", "description", "brand", "1", 0, Product.State.GOOD, null, 1.0, "stone", Year.of(2020));
     }
 
     @AfterEach
@@ -45,9 +45,10 @@ class HandbagTest {
 
     @Test
     void priceCorrection() {
-        handbag.setBasePrice("10.0");
         handbag.setDimension(2.0);
-        assertEquals(0, new BigDecimal("5.0").compareTo(handbag.priceCorrection()));
+        assertEquals(0, new BigDecimal("0.5").compareTo(handbag.priceCorrection()));
+        handbag.setDimension(4.0);
+        assertEquals(0, new BigDecimal("0.75").compareTo(handbag.priceCorrection()));
     }
 
     @Test

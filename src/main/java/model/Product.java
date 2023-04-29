@@ -14,6 +14,7 @@ public abstract class Product {
     private String brand;
     private BigDecimal basePrice;
     private int numberOfPreviousOwners;
+    private State state;
     private ShippingCompany shippingCompany;
 
     /**
@@ -24,15 +25,17 @@ public abstract class Product {
      * @param brand                  Product brand
      * @param basePrice              Product base price
      * @param numberOfPreviousOwners Product number of previous owners
+     * @param state                  Product state
      * @param shippingCompany        Product assigned shipping company
      */
-    public Product(String seller, String description, String brand, String basePrice,int numberOfPreviousOwners, ShippingCompany shippingCompany) {
+    public Product(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany) {
         this.code = nextAlphanumericCode();
         this.seller = seller;
         this.description = description;
         this.brand = brand;
         this.basePrice = new BigDecimal(basePrice);
         this.numberOfPreviousOwners = numberOfPreviousOwners;
+        this.state = state;
         this.shippingCompany = shippingCompany;
     }
 
@@ -48,6 +51,7 @@ public abstract class Product {
         this.brand = other.brand;
         this.basePrice = other.basePrice;
         this.numberOfPreviousOwners = other.numberOfPreviousOwners;
+        this.state = other.state;
         this.shippingCompany = other.shippingCompany;
     }
 
@@ -93,6 +97,14 @@ public abstract class Product {
 
     public void incrementNumberOfPreviousOwners() {
         numberOfPreviousOwners++;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public ShippingCompany getShippingCompany() {
@@ -150,6 +162,7 @@ public abstract class Product {
                 ", brand='" + brand + '\'' +
                 ", basePrice=" + basePrice +
                 ", numberOfPreviousOwners=" + numberOfPreviousOwners +
+                ", state=" + state +
                 ", shippingCompany=" + shippingCompany;
     }
 
@@ -166,6 +179,7 @@ public abstract class Product {
         if (!description.equals(product.description)) return false;
         if (!brand.equals(product.brand)) return false;
         if (!basePrice.equals(product.basePrice)) return false;
+        if (state != product.state) return false;
         return shippingCompany.equals(product.shippingCompany);
     }
 
@@ -177,10 +191,32 @@ public abstract class Product {
         result = 31 * result + brand.hashCode();
         result = 31 * result + basePrice.hashCode();
         result = 31 * result + numberOfPreviousOwners;
+        result = 31 * result + state.hashCode();
         result = 31 * result + shippingCompany.hashCode();
         return result;
     }
 
     @Override
     public abstract Product clone();
+
+    /**
+     * State enum
+     */
+    enum State {
+        NEW_WITH_TAG("1.0"),
+        NEW_WITHOUT_TAG("0.9"),
+        VERY_GOOD("0.8"),
+        GOOD("0.7"),
+        SATISFACTORY("0.6");
+
+        private final BigDecimal priceCorrection;
+
+        State(String priceCorrection) {
+            this.priceCorrection = new BigDecimal(priceCorrection);
+        }
+
+        public BigDecimal getPriceCorrection() {
+            return priceCorrection;
+        }
+    }
 }

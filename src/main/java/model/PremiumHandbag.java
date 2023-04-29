@@ -7,8 +7,8 @@ import java.time.temporal.ChronoUnit;
 public class PremiumHandbag extends Handbag implements Premium {
     private Type type;
 
-    public PremiumHandbag(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, ShippingCompany shippingCompany, double dimension, String material, Year collectionYear, Type type) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, shippingCompany, dimension, material, collectionYear);
+    public PremiumHandbag(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, double dimension, String material, Year collectionYear, Type type) {
+        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany, dimension, material, collectionYear);
         this.type = type;
     }
 

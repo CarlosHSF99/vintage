@@ -30,13 +30,13 @@ public class Sneaker extends Product {
      * @param collectionYear         Sneaker collection year
      * @param discount               Sneaker discount defined by seller
      */
-    public Sneaker(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, int size, Color color, boolean laces, Year collectionYear, BigDecimal discount) {
+    public Sneaker(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, int size, Color color, boolean laces, Year collectionYear, String discount) {
         super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
         this.size = size;
         this.color = color;
         this.laces = laces;
         this.collectionYear = collectionYear;
-        this.sellerPriceCorrection = discount;
+        this.sellerPriceCorrection = new BigDecimal(discount);
     }
 
     /**
@@ -93,6 +93,12 @@ public class Sneaker extends Product {
         this.sellerPriceCorrection = sellerPriceCorrection;
     }
 
+    /**
+     * Returns the price correction.
+     * Price correction is the discount value defined by the user applied when the sneaker is used or is has a size bigger than 45.
+     *
+     * @return price correction
+     */
     public BigDecimal priceCorrection() {
         return isUsed() || size > 45 ? BigDecimal.ONE.subtract(sellerPriceCorrection) : BigDecimal.ONE;
     }

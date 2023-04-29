@@ -22,7 +22,7 @@ public class TShirt extends Product {
      * @param size                   TShirt size
      * @param pattern                TShirt pattern
      */
-    public TShirt(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, int state, ShippingCompany shippingCompany, Size size, Pattern pattern) {
+    public TShirt(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, Size size, Pattern pattern) {
         super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
         this.size = size;
         this.pattern = pattern;
@@ -55,18 +55,13 @@ public class TShirt extends Product {
         this.pattern = pattern;
     }
 
-    public BigDecimal priceCorrection() {
-        return isUsed() ? pattern.getValue() : BigDecimal.ZERO;
-    }
-
     /**
-     * Returns the price of the TShirt as a BigDecimal
+     * Returns the price correction.
      *
-     * @return Price of TShirt as a BigDecimal
+     * @return price correction
      */
-    @Override
-    public BigDecimal price() {
-        return getBasePrice().multiply(BigDecimal.ONE.subtract(priceCorrection()));
+    public BigDecimal priceCorrection() {
+        return isUsed() ? pattern.getValue() : BigDecimal.ONE;
     }
 
     @Override
@@ -104,7 +99,7 @@ public class TShirt extends Product {
     }
 
     enum Pattern {
-        PLAIN("0.0"), STRIPES("0.5"), PALM_TREES("0.5");
+        PLAIN("1.0"), STRIPES("0.5"), PALM_TREES("0.5");
 
         private final BigDecimal value;
 

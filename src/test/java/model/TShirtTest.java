@@ -19,13 +19,13 @@ class TShirtTest {
 
     @BeforeEach
     void setUp() {
-        tshirt = new TShirt("seller", "description", "brand", "1.0", 0, 0, null, Size.S, TShirt.Pattern.PLAIN);
-        newPlainTShirt = new TShirt("", "", "", "1.0", 0, 0, null, Size.S, TShirt.Pattern.PLAIN);
-        usedPlainTShirt = new TShirt("", "", "", "1.0", 1, 0, null, Size.S, TShirt.Pattern.PLAIN);
-        newStripesTShirt = new TShirt("", "", "", "1.0", 0, 0, null, Size.S, TShirt.Pattern.STRIPES);
-        usedStripesTShirt = new TShirt("", "", "", "1.0", 1, 0, null, Size.S, TShirt.Pattern.STRIPES);
-        newPalmTreesTShirt = new TShirt("", "", "", "1.0", 0, 0, null, Size.S, TShirt.Pattern.PALM_TREES);
-        usedPalmTreesTShirt = new TShirt("", "", "", "1.0", 1, 0, null, Size.S, TShirt.Pattern.PALM_TREES);
+        tshirt = new TShirt("seller", "description", "brand", "1.0", 0, Product.State.GOOD, null, Size.S, TShirt.Pattern.PLAIN);
+        newPlainTShirt = new TShirt("", "", "", "1.0", 0, Product.State.GOOD, null, Size.S, TShirt.Pattern.PLAIN);
+        usedPlainTShirt = new TShirt("", "", "", "1.0", 1, Product.State.GOOD, null, Size.S, TShirt.Pattern.PLAIN);
+        newStripesTShirt = new TShirt("", "", "", "1.0", 0, Product.State.GOOD, null, Size.S, TShirt.Pattern.STRIPES);
+        usedStripesTShirt = new TShirt("", "", "", "1.0", 1, Product.State.GOOD, null, Size.S, TShirt.Pattern.STRIPES);
+        newPalmTreesTShirt = new TShirt("", "", "", "1.0", 0, Product.State.GOOD, null, Size.S, TShirt.Pattern.PALM_TREES);
+        usedPalmTreesTShirt = new TShirt("", "", "", "1.0", 1, Product.State.GOOD, null, Size.S, TShirt.Pattern.PALM_TREES);
     }
 
     @AfterEach
@@ -56,17 +56,17 @@ class TShirtTest {
 
     @Test
     void correctionPriceOfNewPlainShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(newPlainTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(newPlainTShirt.priceCorrection()));
     }
 
     @Test
     void correctionPriceOfUsedPlainShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(usedPlainTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(usedPlainTShirt.priceCorrection()));
     }
 
     @Test
     void correctionPriceOfNewStripesShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(newStripesTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(newStripesTShirt.priceCorrection()));
     }
 
     @Test
@@ -76,7 +76,7 @@ class TShirtTest {
 
     @Test
     void correctionPriceOfNewPalmTreesShirt() {
-        assertEquals(0, new BigDecimal("0").compareTo(newPalmTreesTShirt.priceCorrection()));
+        assertEquals(0, new BigDecimal("1").compareTo(newPalmTreesTShirt.priceCorrection()));
     }
 
     @Test

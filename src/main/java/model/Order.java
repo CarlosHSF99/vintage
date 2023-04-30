@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Order {
     private static final BigDecimal SERVICE_FEE_NEW = new BigDecimal("0.5");
@@ -101,7 +102,18 @@ public class Order {
     public BigDecimal finalPrice() {
         return products.values()
                 .stream()
-                .map(product -> product.price().add(product.shippingPrice()))
+                .map(Product::price)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(totalShippingCost());
+    }
+
+    public BigDecimal totalShippingCost() {
+        return products.values()
+                .stream()
+                .collect(Collectors.groupingBy(Product::getShippingCompany))
+                .entrySet()
+                .stream()
+                .map(entry -> entry.getKey().shippingCost(entry.getValue().size()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

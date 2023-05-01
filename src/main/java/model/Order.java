@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Order {
@@ -110,9 +111,11 @@ public class Order {
     public BigDecimal totalShippingCost() {
         return products.values()
                 .stream()
-                .collect(Collectors.groupingBy(Product::getShippingCompany))
-                .entrySet()
+                .collect(Collectors.groupingBy(Product::getSeller))
+                .values()
                 .stream()
+                .map(v -> v.stream().collect(Collectors.groupingBy(Product::getShippingCompany)).entrySet())
+                .flatMap(Set::stream)
                 .map(entry -> entry.getKey().shippingCost(entry.getValue().size()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

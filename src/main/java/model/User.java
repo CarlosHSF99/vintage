@@ -1,10 +1,7 @@
 package model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -18,6 +15,7 @@ public class User {
     private final Map<String, Product> productsSold;
     private final Map<String, Order> ordersMade;
     private final Map<String, Order> ordersReceived;
+    private final Map<String, Product> basket;
     private String email;
     private String name;
     private String address;
@@ -33,6 +31,35 @@ public class User {
         this.productsSold = new HashMap<>();
         this.ordersMade = new HashMap<>();
         this.ordersReceived = new HashMap<>();
+        this.basket = new HashMap<>();
+    }
+
+    public void addProductToBasket(Product product) {
+        basket.put(product.getCode(), product.clone());
+    }
+
+    // add exception
+    public void removeProductFromBasket(String productCode) {
+        basket.remove(productCode);
+    }
+
+    // add exception
+    public void removeProductFromBasket(Product product) {
+        basket.remove(product.getCode());
+    }
+
+    public void clearBasket() {
+        basket.clear();
+    }
+
+    public List<Product> returnBasket() {
+        var products = basket.values().stream().map(Product::clone).toList();
+        basket.clear();
+        return products;
+    }
+
+    public List<Product> getBasket() {
+        return basket.values().stream().map(Product::clone).toList();
     }
 
     public String getCode() {
@@ -138,7 +165,7 @@ public class User {
     }
 
     public BigDecimal revenue() {
-        return ordersReceived.values().stream().map(Order::value).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private String nextAlphanumericCode() {

@@ -9,7 +9,7 @@ public abstract class Product {
     private static long numberOfProducts = 0;
 
     private final String code;
-    private final String seller;
+    private final String sellerCode;
     private String description;
     private String brand;
     private BigDecimal basePrice;
@@ -20,7 +20,7 @@ public abstract class Product {
     /**
      * Parameterized constructor.
      *
-     * @param seller                 Seller identification code
+     * @param sellerCode                 Seller identification code
      * @param description            Product description
      * @param brand                  Product brand
      * @param basePrice              Product base price
@@ -28,9 +28,9 @@ public abstract class Product {
      * @param state                  Product state
      * @param shippingCompany        Product assigned shipping company
      */
-    public Product(String seller, String description, String brand, String basePrice,int numberOfPreviousOwners, State state, ShippingCompany shippingCompany) {
+    public Product(String sellerCode, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany) {
         this.code = nextAlphanumericCode();
-        this.seller = seller;
+        this.sellerCode = sellerCode;
         this.description = description;
         this.brand = brand;
         this.basePrice = new BigDecimal(basePrice);
@@ -46,7 +46,7 @@ public abstract class Product {
      */
     public Product(Product other) {
         this.code = nextAlphanumericCode();
-        this.seller = other.seller;
+        this.sellerCode = other.sellerCode;
         this.description = other.description;
         this.brand = other.brand;
         this.basePrice = other.basePrice;
@@ -59,8 +59,8 @@ public abstract class Product {
         return code;
     }
 
-    public String getSeller() {
-        return seller;
+    public String getSellerCode() {
+        return sellerCode;
     }
 
     public String getDescription() {
@@ -161,7 +161,7 @@ public abstract class Product {
     @Override
     public String toString() {
         return "code='" + code + '\'' +
-                ", seller='" + seller + '\'' +
+                ", seller='" + sellerCode + '\'' +
                 ", description='" + description + '\'' +
                 ", brand='" + brand + '\'' +
                 ", basePrice=" + basePrice +
@@ -179,7 +179,7 @@ public abstract class Product {
 
         if (numberOfPreviousOwners != product.numberOfPreviousOwners) return false;
         if (!code.equals(product.code)) return false;
-        if (!seller.equals(product.seller)) return false;
+        if (!sellerCode.equals(product.sellerCode)) return false;
         if (!description.equals(product.description)) return false;
         if (!brand.equals(product.brand)) return false;
         if (!basePrice.equals(product.basePrice)) return false;
@@ -190,7 +190,7 @@ public abstract class Product {
     @Override
     public int hashCode() {
         int result = code.hashCode();
-        result = 31 * result + seller.hashCode();
+        result = 31 * result + sellerCode.hashCode();
         result = 31 * result + description.hashCode();
         result = 31 * result + brand.hashCode();
         result = 31 * result + basePrice.hashCode();

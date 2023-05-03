@@ -41,7 +41,7 @@ class ProductTest {
 
     @Test
     void getSeller() {
-        assertEquals("seller", product.getSeller());
+        assertEquals("seller", product.getSellerCode());
     }
 
     @Test

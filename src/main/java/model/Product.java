@@ -150,6 +150,10 @@ public abstract class Product {
         return basePrice.multiply(priceCorrection());
     }
 
+    public BigDecimal shippingPrice() {
+        return null;
+    }
+
     private String nextAlphanumericCode() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }

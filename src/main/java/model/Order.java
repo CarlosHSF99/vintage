@@ -6,34 +6,41 @@ import exceptions.StatusOrderException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Order {
-    private static final BigDecimal SERVICE_FEE_NEW = new BigDecimal("0.5");
-    private static final BigDecimal SERVICE_FEE_USED = new BigDecimal("0.25");
+    private static final BigDecimal NEW_FEE = new BigDecimal("0.5");
+    private static final BigDecimal USED_FEE = new BigDecimal("0.25");
     private final Map<String, Product> products;
     private LocalDateTime creationDate;
+    private LocalDateTime deliveryDateTime;
     private Status status;
 
     public Order(Product product) {
         products = new HashMap<>();
-        products.put(product.getCode(), product);
+        products.put(product.getCode(), product.clone());
         status = Status.PENDING;
     }
 
-    private Order(Collection<Product> products, Status status) {
-        this.products = new HashMap<>();
-        products.forEach(p -> this.products.put(p.getCode(), p));
+    private Order(Map<String, Product> products, LocalDateTime creationDate, LocalDateTime deliveryDateTime, Status status) {
+        this.products = products.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        this.creationDate = creationDate;
+        this.deliveryDateTime = deliveryDateTime;
         this.status = status;
     }
 
     private Order(Order other) {
-        products = new HashMap<>(other.products); // .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        products = other.products.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
         creationDate = other.creationDate;
+        deliveryDateTime = other.deliveryDateTime;
         status = other.status;
     }
 
@@ -50,21 +57,24 @@ public class Order {
     }
 
     public Order OrderForSeller(String sellerCode) {
-        return new Order(products.values().stream().filter(p -> p.getSeller().equals(sellerCode)).toList(), status);
+        return new Order(products.entrySet()
+                .stream()
+                .filter(e -> e.getValue().getSeller().equals(sellerCode))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)), creationDate, deliveryDateTime, status);
     }
 
     public Order OrderForShippingCompany(String shippingCompany) {
-        return new Order(products.values()
+        return new Order(products.entrySet()
                 .stream()
-                .filter(p -> p.getSeller().equals(shippingCompany))
-                .toList(), status);
+                .filter(e -> e.getValue().getSeller().equals(shippingCompany))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)), creationDate, deliveryDateTime, status);
     }
 
     public void addProduct(Product product) {
         products.put(product.getCode(), product);
     }
 
-    public void finish() {
+    public void finish() throws StatusOrderException {
         if (status != Status.PENDING) {
             throw new StatusOrderException("Trying to finnish " + status.name() + "order.\nOnly pending orders can be finished.");
         }
@@ -79,16 +89,20 @@ public class Order {
         status = Status.EXPEDITED;
     }
 
-    public void deliver() {
+    public void deliver() throws StatusOrderException {
         if (status != Status.EXPEDITED) {
             throw new StatusOrderException("Trying to deliver " + status.name() + "order.\nOnly expedited orders can be delivered.");
         }
+        creationDate = LocalDateTime.now();
         status = Status.DELIVERED;
     }
 
-    public void refund() throws LateReturnException {
+    public void refund() throws StatusOrderException, LateReturnException {
         if (status != Status.DELIVERED) {
             throw new StatusOrderException("Trying to return " + status.name() + "order.\nOnly delivered orders can be returned.");
+        }
+        if (deliveryDateTime.until(LocalDateTime.now(), ChronoUnit.HOURS) > 48) {
+            throw new LateReturnException("Trying to return order past return time");
         }
         status = Status.RETURNED;
     }
@@ -103,7 +117,7 @@ public class Order {
     public BigDecimal finalPrice() {
         return products.values()
                 .stream()
-                .map(Product::price)
+                .map(product -> product.price().add(product.isUsed() ? USED_FEE : NEW_FEE))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .add(totalShippingCost());
     }
@@ -121,12 +135,10 @@ public class Order {
     }
 
     public BigDecimal sellerRevenue() {
-        return products.values()
-                .stream()
-                .map(product -> product.price()
-                        .add(product.shippingPrice())
-                        .subtract(product.isUsed() ? SERVICE_FEE_USED : SERVICE_FEE_NEW))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (status == Status.PENDING || status == Status.RETURNED) {
+            return BigDecimal.ZERO;
+        }
+        return products.values().stream().map(Product::price).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override

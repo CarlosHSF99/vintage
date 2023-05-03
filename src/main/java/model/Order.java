@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -103,6 +104,45 @@ public class Order {
                 .stream()
                 .map(Product::price)
                 .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "products=" + products +
+                ", creationDate=" + creationDate +
+                ", deliveryDateTime=" + deliveryDateTime +
+                ", status=" + status +
+                ", sellerCode='" + sellerCode + '\'' +
+                ", shippingCompany=" + shippingCompany +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Order order = (Order) o;
+
+        if (!products.equals(order.products)) return false;
+        if (!creationDate.equals(order.creationDate)) return false;
+        if (!Objects.equals(deliveryDateTime, order.deliveryDateTime))
+            return false;
+        if (status != order.status) return false;
+        if (!sellerCode.equals(order.sellerCode)) return false;
+        return shippingCompany.equals(order.shippingCompany);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = products.hashCode();
+        result = 31 * result + creationDate.hashCode();
+        result = 31 * result + (deliveryDateTime != null ? deliveryDateTime.hashCode() : 0);
+        result = 31 * result + status.hashCode();
+        result = 31 * result + sellerCode.hashCode();
+        result = 31 * result + shippingCompany.hashCode();
+        return result;
     }
 
     @Override

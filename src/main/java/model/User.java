@@ -16,7 +16,7 @@ public class User {
     private final Map<String, Product> productsSold;
     private final List<Order> ordersMade;
     private final List<Order> ordersReceived;
-    private final Map<String, Product> basket;
+    private final Map<String, Product> cart;
     private String email;
     private String address;
 
@@ -31,7 +31,7 @@ public class User {
         this.productsSold = new HashMap<>();
         this.ordersMade = new ArrayList<>();
         this.ordersReceived = new ArrayList<>();
-        this.basket = new HashMap<>();
+        this.cart = new HashMap<>();
     }
 
     private User(User other) {
@@ -45,7 +45,7 @@ public class User {
         this.productsSold = new HashMap<>(other.productsSold);
         this.ordersMade = new ArrayList<>(other.ordersMade);
         this.ordersReceived = new ArrayList<>(other.ordersReceived);
-        this.basket = other.basket.entrySet()
+        this.cart = other.cart.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
     }
@@ -78,32 +78,33 @@ public class User {
         this.address = address;
     }
 
-    public void addProductToBasket(Product product) {
-        basket.put(product.getCode(), product.clone());
+    public void addProductToCart(Product product) {
+        cart.put(product.getCode(), product.clone());
     }
 
     // add exception
-    public void removeProductFromBasket(String productCode) {
-        basket.remove(productCode);
+    public void removeProductFromCart(String productCode) {
+        cart.remove(productCode);
     }
 
     // add exception
-    public void removeProductFromBasket(Product product) {
-        basket.remove(product.getCode());
+    public void removeProductFromCart(Product product) {
+        cart.remove(product.getCode());
     }
 
-    public void clearBasket() {
-        basket.clear();
+
+    public void clearCart() {
+        cart.clear();
     }
 
-    public List<Product> returnBasket() {
-        var products = basket.values().stream().map(Product::clone).toList();
-        basket.clear();
+    public List<Product> returnCart() {
+        var products = cart.values().stream().map(Product::clone).toList();
+        cart.clear();
         return products;
     }
 
-    public List<Product> getBasket() {
-        return basket.values().stream().map(Product::clone).toList();
+    public List<Product> getCart() {
+        return cart.values().stream().map(Product::clone).toList();
     }
 
     public void addProductSold(Product product) {
@@ -146,6 +147,7 @@ public class User {
         ordersReceived.addAll(orders);
     }
 
+
     public List<Product> getProductsBought() {
         return getProducts(productsBought);
     }
@@ -164,6 +166,10 @@ public class User {
 
     public List<Order> getOrdersReceived() {
         return ordersReceived.stream().map(Order::clone).toList();
+    }
+
+    public void removeProductSelling(String productCode) {
+        productsSelling.remove(productCode);
     }
 
     private void addProduct(Map<String, Product> products, Product product) {
@@ -197,7 +203,7 @@ public class User {
                 ", productsSold=" + productsSold +
                 ", ordersMade=" + ordersMade +
                 ", ordersReceived=" + ordersReceived +
-                ", basket=" + basket +
+                ", cart=" + cart +
                 ", email='" + email + '\'' +
                 ", address='" + address + '\'' +
                 '}';
@@ -220,7 +226,7 @@ public class User {
         if (!productsSold.equals(user.productsSold)) return false;
         if (!ordersMade.equals(user.ordersMade)) return false;
         if (!ordersReceived.equals(user.ordersReceived)) return false;
-        return basket.equals(user.basket);
+        return cart.equals(user.cart);
     }
 
     @Override
@@ -235,7 +241,7 @@ public class User {
         result = 31 * result + productsSold.hashCode();
         result = 31 * result + ordersMade.hashCode();
         result = 31 * result + ordersReceived.hashCode();
-        result = 31 * result + basket.hashCode();
+        result = 31 * result + cart.hashCode();
         return result;
     }
 

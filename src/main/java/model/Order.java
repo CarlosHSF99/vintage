@@ -62,6 +62,10 @@ public class Order {
         return status;
     }
 
+    public ShippingCompany getShippingCompany() {
+        return shippingCompany;
+    }
+
     public void expedite() throws StatusOrderException {
         if (status != Status.INITIALIZED) {
             throw new StatusOrderException("Trying to expedite " + status.name() + "order.\nOnly initialized orders can be expedited.");

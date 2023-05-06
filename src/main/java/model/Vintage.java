@@ -1,5 +1,7 @@
 package model;
 
+import exceptions.ProductInCartUnavailable;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,13 +56,16 @@ public class Vintage {
         }
     }
 
-    public void orderUserCart(String userCode) {
+    public void orderUserCart(String userCode) throws ProductInCartUnavailable {
         record SellerShippingCompanyPair(String sellerCode, ShippingCompany shippingCompany) {
         }
         User client = users.get(userCode);
         List<Product> cart = client.returnCart();
         if (!productsSelling.values().containsAll(cart)) {
-            return;
+            for (var product : cart.stream().filter(product -> productsSelling.containsKey(product.getCode())).toList()) {
+                client.addProductToCart(product);
+            }
+            throw new ProductInCartUnavailable("Product in cart unavailable.");
         }
         cart.forEach(product -> {
             productsSelling.remove(product.getCode());

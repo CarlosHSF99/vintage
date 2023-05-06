@@ -1,13 +1,15 @@
 package model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShippingCompany {
+    private static long numberOfProducts = 0;
+
+    private final String id;
     private final String name;
-    private final List<Order> orders;
+    private final Map<String, Order> orders;
     private BigDecimal baseValueSmall;
     private BigDecimal baseValueMedium;
     private BigDecimal baseValueBig;
@@ -15,27 +17,33 @@ public class ShippingCompany {
     private BigDecimal revenue;
 
     public ShippingCompany(String name, BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal fee) {
+        this.id = nextAlphanumericId();
         this.name = name;
         this.baseValueSmall = baseValueSmall;
         this.baseValueMedium = baseValueMedium;
         this.baseValueBig = baseValueBig;
         this.fee = fee;
         this.revenue = BigDecimal.ZERO;
-        this.orders = new ArrayList<>();
+        this.orders = new HashMap<>();
     }
 
     private ShippingCompany(ShippingCompany other) {
+        this.id = other.id;
         this.name = other.name;
         this.baseValueSmall = other.baseValueSmall;
         this.baseValueMedium = other.baseValueMedium;
         this.baseValueBig = other.baseValueBig;
         this.fee = other.fee;
         this.revenue = other.revenue;
-        this.orders = other.orders.stream().map(Order::clone).collect(Collectors.toCollection(ArrayList::new));
+        this.orders = new HashMap<>(other.orders);
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     public void addOrder(Order order) {
-        orders.add(order.clone());
+        orders.put(order.getId(), order);
         revenue = revenue.add(shippingCost(order.getProducts().size()));
     }
 
@@ -47,6 +55,10 @@ public class ShippingCompany {
         } else {
             return baseValueBig.multiply(BigDecimal.ONE.add(fee));
         }
+    }
+
+    private String nextAlphanumericId() {
+        return String.format("%4s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
 
     public ShippingCompany clone() {

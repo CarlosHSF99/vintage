@@ -14,6 +14,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Order {
+    private static long numberOfProducts = 0;
+
+    private final String code;
     private static final BigDecimal NEW_FEE = new BigDecimal("0.5");
     private static final BigDecimal USED_FEE = new BigDecimal("0.25");
     private final Map<String, Product> products;
@@ -24,6 +27,7 @@ public class Order {
     private final ShippingCompany shippingCompany;
 
     public Order(Collection<Product> products, String sellerCode, ShippingCompany shippingCompany) {
+        this.code = nextAlphanumericCode();
         this.products = products.stream().collect(Collectors.toMap(Product::getCode, Function.identity()));
         this.sellerCode = sellerCode;
         this.shippingCompany = shippingCompany.clone();
@@ -32,6 +36,7 @@ public class Order {
     }
 
     private Order(Order other) {
+        this.code = nextAlphanumericCode();
         this.products = other.products.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
@@ -40,6 +45,10 @@ public class Order {
         this.status = other.status;
         this.sellerCode = other.sellerCode;
         this.shippingCompany = other.shippingCompany.clone();
+    }
+
+    public String getCode() {
+        return code;
     }
 
     public Map<String, Product> getProducts() {
@@ -108,6 +117,10 @@ public class Order {
                 .stream()
                 .map(Product::price)
                 .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
+    }
+
+    private String nextAlphanumericCode() {
+        return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
 
     @Override

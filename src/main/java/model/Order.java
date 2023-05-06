@@ -6,53 +6,52 @@ import exceptions.StatusOrderException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Order {
-    private static long numberOfProducts = 0;
-
-    private final String code;
     private static final BigDecimal NEW_FEE = new BigDecimal("0.5");
     private static final BigDecimal USED_FEE = new BigDecimal("0.25");
+    private static long numberOfProducts = 0;
+    private final String id;
     private final Map<String, Product> products;
     private final LocalDateTime creationDate;
+    private final String sellerId;
+    private final String buyerId;
+    private final ShippingCompany shippingCompany;
     private LocalDateTime deliveryDateTime;
     private Status status;
-    private final String sellerCode;
-    private final ShippingCompany shippingCompany;
 
-    public Order(Collection<Product> products, String sellerCode, ShippingCompany shippingCompany) {
-        this.code = nextAlphanumericCode();
-        this.products = products.stream().collect(Collectors.toMap(Product::getCode, Function.identity()));
-        this.sellerCode = sellerCode;
+    public Order(Collection<Product> products, String sellerId, String buyerId, ShippingCompany shippingCompany) {
+        this.id = nextAlphanumericId();
+        this.products = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+        this.sellerId = sellerId;
+        this.buyerId = buyerId;
         this.shippingCompany = shippingCompany.clone();
         this.creationDate = LocalDateTime.now();
         this.status = Status.INITIALIZED;
     }
 
     private Order(Order other) {
-        this.code = nextAlphanumericCode();
+        this.id = nextAlphanumericId();
         this.products = other.products.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
         this.creationDate = other.creationDate;
         this.deliveryDateTime = other.deliveryDateTime;
         this.status = other.status;
-        this.sellerCode = other.sellerCode;
+        this.sellerId = other.sellerId;
         this.shippingCompany = other.shippingCompany.clone();
+        this.buyerId = other.buyerId;
     }
 
-    public String getCode() {
-        return code;
+    public String getId() {
+        return id;
     }
 
-    public Map<String, Product> getProducts() {
-        return new HashMap<>(products);
+    public List<Product> getProducts() {
+        return new ArrayList<>(products.values());
     }
 
     public LocalDateTime getCreationDate() {
@@ -63,12 +62,24 @@ public class Order {
         return deliveryDateTime;
     }
 
-    public String getSellerCode() {
-        return sellerCode;
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public String getBuyerId() {
+        return buyerId;
     }
 
     public Status getStatus() {
         return status;
+    }
+
+    public boolean wasReturned() {
+        return status == Status.RETURNED;
+    }
+
+    public boolean wasNotReturned() {
+        return status != Status.RETURNED;
     }
 
     public ShippingCompany getShippingCompany() {
@@ -90,7 +101,7 @@ public class Order {
         status = Status.DELIVERED;
     }
 
-    public void refund() throws StatusOrderException, LateReturnException {
+    public void setAsReturned() throws StatusOrderException, LateReturnException {
         if (status != Status.DELIVERED) {
             throw new StatusOrderException("Trying to return " + status.name() + "order.\nOnly delivered orders can be returned.");
         }
@@ -101,15 +112,22 @@ public class Order {
     }
 
     public BigDecimal finalCost() {
-        return products.values()
-                .stream()
-                .map(product -> product.price().add(product.isUsed() ? USED_FEE : NEW_FEE))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .add(shippingCost());
+        return productsCost().add(shippingCost()).add(vintageFees());
+    }
+
+    public BigDecimal productsCost() {
+        return products.values().stream().map(Product::price).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal shippingCost() {
         return shippingCompany.shippingCost(products.size());
+    }
+
+    public BigDecimal vintageFees() {
+        return products.values()
+                .stream()
+                .map(product -> product.isNew() ? NEW_FEE : USED_FEE)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal sellerRevenue() {
@@ -119,7 +137,7 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
     }
 
-    private String nextAlphanumericCode() {
+    private String nextAlphanumericId() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
 
@@ -130,7 +148,7 @@ public class Order {
                 ", creationDate=" + creationDate +
                 ", deliveryDateTime=" + deliveryDateTime +
                 ", status=" + status +
-                ", sellerCode='" + sellerCode + '\'' +
+                ", sellerCode='" + sellerId + '\'' +
                 ", shippingCompany=" + shippingCompany +
                 '}';
     }
@@ -147,7 +165,7 @@ public class Order {
         if (!Objects.equals(deliveryDateTime, order.deliveryDateTime))
             return false;
         if (status != order.status) return false;
-        if (!sellerCode.equals(order.sellerCode)) return false;
+        if (!sellerId.equals(order.sellerId)) return false;
         return shippingCompany.equals(order.shippingCompany);
     }
 
@@ -157,7 +175,7 @@ public class Order {
         result = 31 * result + creationDate.hashCode();
         result = 31 * result + (deliveryDateTime != null ? deliveryDateTime.hashCode() : 0);
         result = 31 * result + status.hashCode();
-        result = 31 * result + sellerCode.hashCode();
+        result = 31 * result + sellerId.hashCode();
         result = 31 * result + shippingCompany.hashCode();
         return result;
     }

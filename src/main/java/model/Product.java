@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public abstract class Product {
     private static long numberOfProducts = 0;
 
-    private final String code;
+    private final String id;
     private final String sellerCode;
     private String description;
     private String brand;
@@ -29,7 +29,7 @@ public abstract class Product {
      * @param shippingCompany        Product assigned shipping company
      */
     public Product(String sellerCode, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany) {
-        this.code = nextAlphanumericCode();
+        this.id = nextAlphanumericId();
         this.sellerCode = sellerCode;
         this.description = description;
         this.brand = brand;
@@ -45,7 +45,7 @@ public abstract class Product {
      * @param other Other Product
      */
     public Product(Product other) {
-        this.code = nextAlphanumericCode();
+        this.id = nextAlphanumericId();
         this.sellerCode = other.sellerCode;
         this.description = other.description;
         this.brand = other.brand;
@@ -55,8 +55,8 @@ public abstract class Product {
         this.shippingCompany = other.shippingCompany;
     }
 
-    public String getCode() {
-        return code;
+    public String getId() {
+        return id;
     }
 
     public String getSellerCode() {
@@ -154,13 +154,13 @@ public abstract class Product {
         return null;
     }
 
-    private String nextAlphanumericCode() {
+    private String nextAlphanumericId() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
 
     @Override
     public String toString() {
-        return "code='" + code + '\'' +
+        return "code='" + id + '\'' +
                 ", seller='" + sellerCode + '\'' +
                 ", description='" + description + '\'' +
                 ", brand='" + brand + '\'' +
@@ -178,7 +178,7 @@ public abstract class Product {
         Product product = (Product) o;
 
         if (numberOfPreviousOwners != product.numberOfPreviousOwners) return false;
-        if (!code.equals(product.code)) return false;
+        if (!id.equals(product.id)) return false;
         if (!sellerCode.equals(product.sellerCode)) return false;
         if (!description.equals(product.description)) return false;
         if (!brand.equals(product.brand)) return false;
@@ -189,7 +189,7 @@ public abstract class Product {
 
     @Override
     public int hashCode() {
-        int result = code.hashCode();
+        int result = id.hashCode();
         result = 31 * result + sellerCode.hashCode();
         result = 31 * result + description.hashCode();
         result = 31 * result + brand.hashCode();

@@ -1,19 +1,20 @@
 package model;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class User {
     private static long numberOfUsers = 0;
 
-    private final String code;
+    private final String id;
     private final String taxNumber;
     private final String name;
-    private final Map<String, Product> productsBought;
-    private final Map<String, Product> productsSelling;
-    private final Map<String, Product> productsSold;
+    private final Map<String, Product> products;
     private final Map<String, Order> ordersMade;
     private final Map<String, Order> ordersReceived;
     private final Map<String, Product> cart;
@@ -21,28 +22,24 @@ public class User {
     private String address;
 
     public User(String email, String name, String address, String taxNumber) {
-        this.code = nextAlphanumericCode();
+        this.id = nextAlphanumericId();
         this.email = email;
         this.name = name;
         this.address = address;
         this.taxNumber = taxNumber;
-        this.productsBought = new HashMap<>();
-        this.productsSelling = new HashMap<>();
-        this.productsSold = new HashMap<>();
+        this.products = new HashMap<>();
         this.ordersMade = new HashMap<>();
         this.ordersReceived = new HashMap<>();
         this.cart = new HashMap<>();
     }
 
     private User(User other) {
-        this.code = other.code;
+        this.id = other.id;
         this.taxNumber = other.taxNumber;
         this.name = other.name;
         this.email = other.email;
         this.address = other.address;
-        this.productsBought = new HashMap<>(other.productsBought);
-        this.productsSelling = new HashMap<>(other.productsSelling);
-        this.productsSold = new HashMap<>(other.productsSold);
+        this.products = new HashMap<>(other.products);
         this.ordersMade = new HashMap<>(other.ordersMade);
         this.ordersReceived = new HashMap<>(other.ordersReceived);
         this.cart = other.cart.entrySet()
@@ -50,8 +47,8 @@ public class User {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
     }
 
-    public String getCode() {
-        return code;
+    public String getId() {
+        return id;
     }
 
     public String getTaxNumber() {
@@ -79,7 +76,7 @@ public class User {
     }
 
     public void addProductToCart(Product product) {
-        cart.put(product.getCode(), product.clone());
+        cart.put(product.getId(), product.clone());
     }
 
     // add exception
@@ -89,7 +86,7 @@ public class User {
 
     // add exception
     public void removeProductFromCart(Product product) {
-        cart.remove(product.getCode());
+        cart.remove(product.getId());
     }
 
 
@@ -107,56 +104,41 @@ public class User {
         return cart.values().stream().map(Product::clone).toList();
     }
 
-    public void addProductSold(Product product) {
-        addProduct(productsSold, product);
-    }
-
-    public void addProductsSold(List<Product> products) {
-        addProducts(productsSold, products);
-    }
-
     public void addProductSelling(Product product) {
-        addProduct(productsSelling, product);
+        addProduct(products, product);
     }
 
     public void addProductsSelling(List<Product> products) {
-        addProducts(productsSelling, products);
-    }
-
-    public void addProductBought(Product product) {
-        addProduct(productsBought, product);
-    }
-
-    public void addProductsBought(List<Product> products) {
-        addProducts(productsBought, products);
+        addProducts(this.products, products);
     }
 
     public void addOrderMade(Order order) {
-        ordersMade.put(order.getCode(), order);
+        ordersMade.put(order.getId(), order);
     }
 
     public void addOrdersMade(List<Order> orders) {
-        orders.forEach(order -> ordersMade.put(order.getCode(), order));
+        orders.forEach(order -> ordersMade.put(order.getId(), order));
     }
 
     public void addOrderReceived(Order order) {
-        ordersReceived.put(order.getCode(), order);
+        ordersReceived.put(order.getId(), order);
+        order.getProducts().stream().map(Product::getId).forEach(products.keySet()::remove);
     }
 
     public void addOrdersReceived(List<Order> orders) {
-        orders.forEach(order -> ordersReceived.put(order.getCode(), order));
+        orders.forEach(this::addOrderMade);
     }
 
-    public List<Product> getProductsBought() {
-        return getProducts(productsBought);
-    }
-
-    public List<Product> getProductsSelling() {
-        return getProducts(productsSelling);
+    public List<Product> getProducts() {
+        return products.values().stream().toList();
     }
 
     public List<Product> getProductsSold() {
-        return getProducts(productsSold);
+        return ordersReceived.values().stream().flatMap(order -> order.getProducts().stream()).toList();
+    }
+
+    public List<Product> getProductsBought() {
+        return ordersMade.values().stream().flatMap(order -> order.getProducts().stream()).toList();
     }
 
     public List<Order> getOrdersMade() {
@@ -168,28 +150,15 @@ public class User {
     }
 
     public void removeProductSelling(String productCode) {
-        productsSelling.remove(productCode);
-    }
-
-    public void sellProduct(String productCode) {
-        if (productsSelling.containsKey(productCode)) {
-            productsSold.put(productCode, productsSelling.get(productCode));
-        }
-    }
-
-    public void sellProduct(Product product) {
-        String productCode = product.getCode();
-        if (productsSelling.containsKey(productCode)) {
-            productsSold.put(productCode, productsSelling.get(productCode));
-        }
+        products.remove(productCode);
     }
 
     private void addProduct(Map<String, Product> products, Product product) {
-        products.put(product.getCode(), product);
+        products.put(product.getId(), product);
     }
 
     private void addProducts(Map<String, Product> products, List<Product> newProducts) {
-        products.putAll(newProducts.stream().collect(Collectors.toMap(Product::getCode, Function.identity())));
+        products.putAll(newProducts.stream().collect(Collectors.toMap(Product::getId, Function.identity())));
     }
 
     private List<Product> getProducts(Map<String, Product> products) {
@@ -200,19 +169,17 @@ public class User {
         return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private String nextAlphanumericCode() {
+    private String nextAlphanumericId() {
         return String.format("%6s", Long.toString(numberOfUsers++, 36)).replace(' ', '0');
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "code='" + code + '\'' +
+                "code='" + id + '\'' +
                 ", taxNumber='" + taxNumber + '\'' +
                 ", name='" + name + '\'' +
-                ", productsBought=" + productsBought +
-                ", productsSelling=" + productsSelling +
-                ", productsSold=" + productsSold +
+                ", productsSelling=" + products +
                 ", ordersMade=" + ordersMade +
                 ", ordersReceived=" + ordersReceived +
                 ", cart=" + cart +
@@ -228,29 +195,17 @@ public class User {
 
         User user = (User) o;
 
-        if (!code.equals(user.code)) return false;
-        if (!taxNumber.equals(user.taxNumber)) return false;
-        if (!name.equals(user.name)) return false;
-        if (!email.equals(user.email)) return false;
-        if (!address.equals(user.address)) return false;
-        if (!productsBought.equals(user.productsBought)) return false;
-        if (!productsSelling.equals(user.productsSelling)) return false;
-        if (!productsSold.equals(user.productsSold)) return false;
-        if (!ordersMade.equals(user.ordersMade)) return false;
-        if (!ordersReceived.equals(user.ordersReceived)) return false;
-        return cart.equals(user.cart);
+        return id.equals(user.id);
     }
 
     @Override
     public int hashCode() {
-        int result = code.hashCode();
+        int result = id.hashCode();
         result = 31 * result + taxNumber.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + email.hashCode();
         result = 31 * result + address.hashCode();
-        result = 31 * result + productsBought.hashCode();
-        result = 31 * result + productsSelling.hashCode();
-        result = 31 * result + productsSold.hashCode();
+        result = 31 * result + products.hashCode();
         result = 31 * result + ordersMade.hashCode();
         result = 31 * result + ordersReceived.hashCode();
         result = 31 * result + cart.hashCode();

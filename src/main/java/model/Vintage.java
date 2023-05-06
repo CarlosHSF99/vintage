@@ -57,24 +57,32 @@ public class Vintage {
     }
 
     public void orderUserCart(String userCode) throws ProductInCartUnavailable {
-        record SellerShippingCompanyPair(String sellerCode, ShippingCompany shippingCompany) {
-        }
+        // get buying user
         User client = users.get(userCode);
+
+        // get cart from buying user
         List<Product> cart = client.returnCart();
+
+        // check if cart is valid
         if (!productsSelling.values().containsAll(cart)) {
-            for (var product : cart.stream().filter(product -> productsSelling.containsKey(product.getCode())).toList()) {
-                client.addProductToCart(product);
-            }
+            cart.stream()
+                    .filter(product -> productsSelling.containsKey(product.getCode()))
+                    .forEach(client::addProductToCart);
             throw new ProductInCartUnavailable("Product in cart unavailable.");
         }
+
+        // auxiliary (seller code, shipping company) pair
+        record SellerShippingCompanyPair(String sellerCode, ShippingCompany shippingCompany) {
+        }
+        // move cart products
         cart.forEach(product -> {
             productsSelling.remove(product.getCode());
             productsSold.put(product.getCode(), product);
             client.addProductBought(product);
-            User seller = users.get(product.getSellerCode());
-            seller.addProductSold(product);
-            seller.removeProductSelling(product.getCode());
+            users.get(product.getSellerCode()).sellProduct(product);
         });
+
+        // generate and distribute orders
         cart.stream()
                 .map(Product::clone)
                 .collect(Collectors.groupingBy(p -> new SellerShippingCompanyPair(p.getSellerCode(), p.getShippingCompany())))
@@ -87,12 +95,5 @@ public class Vintage {
                     users.get(order.getSellerCode()).addOrderReceived(order);
                     order.getShippingCompany().addOrder(order);
                 });
-        /*
-        orders.addAll(newOrders);
-        users.get(userCode).addOrdersMade(orders);
-        for (var order : orders) {
-            users.get(order.getSellerCode()).addOrderReceived(order);
-        }
-         */
     }
 }

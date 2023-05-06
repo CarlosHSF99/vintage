@@ -14,8 +14,8 @@ public class User {
     private final Map<String, Product> productsBought;
     private final Map<String, Product> productsSelling;
     private final Map<String, Product> productsSold;
-    private final List<Order> ordersMade;
-    private final List<Order> ordersReceived;
+    private final Map<String, Order> ordersMade;
+    private final Map<String, Order> ordersReceived;
     private final Map<String, Product> cart;
     private String email;
     private String address;
@@ -29,8 +29,8 @@ public class User {
         this.productsBought = new HashMap<>();
         this.productsSelling = new HashMap<>();
         this.productsSold = new HashMap<>();
-        this.ordersMade = new ArrayList<>();
-        this.ordersReceived = new ArrayList<>();
+        this.ordersMade = new HashMap<>();
+        this.ordersReceived = new HashMap<>();
         this.cart = new HashMap<>();
     }
 
@@ -43,8 +43,8 @@ public class User {
         this.productsBought = new HashMap<>(other.productsBought);
         this.productsSelling = new HashMap<>(other.productsSelling);
         this.productsSold = new HashMap<>(other.productsSold);
-        this.ordersMade = new ArrayList<>(other.ordersMade);
-        this.ordersReceived = new ArrayList<>(other.ordersReceived);
+        this.ordersMade = new HashMap<>(other.ordersMade);
+        this.ordersReceived = new HashMap<>(other.ordersReceived);
         this.cart = other.cart.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
@@ -132,21 +132,20 @@ public class User {
     }
 
     public void addOrderMade(Order order) {
-        ordersMade.add(order);
+        ordersMade.put(order.getCode(), order);
     }
 
     public void addOrdersMade(List<Order> orders) {
-        ordersMade.addAll(orders);
+        orders.forEach(order -> ordersMade.put(order.getCode(), order));
     }
 
     public void addOrderReceived(Order order) {
-        ordersReceived.add(order);
+        ordersReceived.put(order.getCode(), order);
     }
 
     public void addOrdersReceived(List<Order> orders) {
-        ordersReceived.addAll(orders);
+        orders.forEach(order -> ordersReceived.put(order.getCode(), order));
     }
-
 
     public List<Product> getProductsBought() {
         return getProducts(productsBought);
@@ -161,15 +160,28 @@ public class User {
     }
 
     public List<Order> getOrdersMade() {
-        return ordersMade.stream().map(Order::clone).toList();
+        return ordersMade.values().stream().map(Order::clone).toList();
     }
 
     public List<Order> getOrdersReceived() {
-        return ordersReceived.stream().map(Order::clone).toList();
+        return ordersReceived.values().stream().map(Order::clone).toList();
     }
 
     public void removeProductSelling(String productCode) {
         productsSelling.remove(productCode);
+    }
+
+    public void sellProduct(String productCode) {
+        if (productsSelling.containsKey(productCode)) {
+            productsSold.put(productCode, productsSelling.get(productCode));
+        }
+    }
+
+    public void sellProduct(Product product) {
+        String productCode = product.getCode();
+        if (productsSelling.containsKey(productCode)) {
+            productsSold.put(productCode, productsSelling.get(productCode));
+        }
     }
 
     private void addProduct(Map<String, Product> products, Product product) {
@@ -185,7 +197,7 @@ public class User {
     }
 
     public BigDecimal revenue() {
-        return ordersReceived.stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private String nextAlphanumericCode() {

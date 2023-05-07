@@ -9,34 +9,34 @@ public abstract class Product {
     private static long numberOfProducts = 0;
 
     private final String id;
-    private final String sellerCode;
-    private String description;
-    private String brand;
-    private BigDecimal basePrice;
-    private int numberOfPreviousOwners;
-    private State state;
-    private ShippingCompany shippingCompany;
+    private final String sellerId;
+    private final String shippingCompanyId;
+    private final String description;
+    private final String brand;
+    private final BigDecimal basePrice;
+    private final int numberOfPreviousOwners;
+    private final State state;
 
     /**
      * Parameterized constructor.
      *
-     * @param sellerCode                 Seller identification code
+     * @param sellerId               Seller identification code
+     * @param shippingCompanyId      Product assigned shipping company
      * @param description            Product description
      * @param brand                  Product brand
      * @param basePrice              Product base price
      * @param numberOfPreviousOwners Product number of previous owners
      * @param state                  Product state
-     * @param shippingCompany        Product assigned shipping company
      */
-    public Product(String sellerCode, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany) {
+    public Product(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state) {
         this.id = nextAlphanumericId();
-        this.sellerCode = sellerCode;
+        this.sellerId = sellerId;
+        this.shippingCompanyId = shippingCompanyId;
         this.description = description;
         this.brand = brand;
-        this.basePrice = new BigDecimal(basePrice);
+        this.basePrice = basePrice;
         this.numberOfPreviousOwners = numberOfPreviousOwners;
         this.state = state;
-        this.shippingCompany = shippingCompany;
     }
 
     /**
@@ -46,73 +46,45 @@ public abstract class Product {
      */
     public Product(Product other) {
         this.id = nextAlphanumericId();
-        this.sellerCode = other.sellerCode;
+        this.sellerId = other.sellerId;
+        this.shippingCompanyId = other.shippingCompanyId;
         this.description = other.description;
         this.brand = other.brand;
         this.basePrice = other.basePrice;
         this.numberOfPreviousOwners = other.numberOfPreviousOwners;
         this.state = other.state;
-        this.shippingCompany = other.shippingCompany;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getSellerCode() {
-        return sellerCode;
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public String getShippingCompanyId() {
+        return shippingCompanyId;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getBrand() {
         return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
     }
 
     public BigDecimal getBasePrice() {
         return basePrice;
     }
 
-    public void setBasePrice(String basePrice) {
-        this.basePrice = new BigDecimal(basePrice);
-    }
-
     public int getNumberOfPreviousOwners() {
         return numberOfPreviousOwners;
     }
 
-    public void setNumberOfPreviousOwners(int numberOfPreviousOwners) {
-        this.numberOfPreviousOwners = numberOfPreviousOwners;
-    }
-
-    public void incrementNumberOfPreviousOwners() {
-        numberOfPreviousOwners++;
-    }
-
     public State getState() {
         return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public ShippingCompany getShippingCompany() {
-        return shippingCompany;
-    }
-
-    public void setShippingCompany(ShippingCompany shippingCompany) {
-        this.shippingCompany = shippingCompany;
     }
 
     /**
@@ -150,24 +122,22 @@ public abstract class Product {
         return basePrice.multiply(priceCorrection());
     }
 
-    public BigDecimal shippingPrice() {
-        return null;
-    }
-
     private String nextAlphanumericId() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
 
     @Override
     public String toString() {
-        return "code='" + id + '\'' +
-                ", seller='" + sellerCode + '\'' +
+        return "Product{" +
+                "id='" + id + '\'' +
+                ", sellerId='" + sellerId + '\'' +
+                ", shippingCompanyId='" + shippingCompanyId + '\'' +
                 ", description='" + description + '\'' +
                 ", brand='" + brand + '\'' +
                 ", basePrice=" + basePrice +
                 ", numberOfPreviousOwners=" + numberOfPreviousOwners +
                 ", state=" + state +
-                ", shippingCompany=" + shippingCompany;
+                '}';
     }
 
     @Override
@@ -179,24 +149,24 @@ public abstract class Product {
 
         if (numberOfPreviousOwners != product.numberOfPreviousOwners) return false;
         if (!id.equals(product.id)) return false;
-        if (!sellerCode.equals(product.sellerCode)) return false;
+        if (!sellerId.equals(product.sellerId)) return false;
+        if (!shippingCompanyId.equals(product.shippingCompanyId)) return false;
         if (!description.equals(product.description)) return false;
         if (!brand.equals(product.brand)) return false;
         if (!basePrice.equals(product.basePrice)) return false;
-        if (state != product.state) return false;
-        return shippingCompany.equals(product.shippingCompany);
+        return state == product.state;
     }
 
     @Override
     public int hashCode() {
         int result = id.hashCode();
-        result = 31 * result + sellerCode.hashCode();
+        result = 31 * result + sellerId.hashCode();
+        result = 31 * result + shippingCompanyId.hashCode();
         result = 31 * result + description.hashCode();
         result = 31 * result + brand.hashCode();
         result = 31 * result + basePrice.hashCode();
         result = 31 * result + numberOfPreviousOwners;
         result = 31 * result + state.hashCode();
-        result = 31 * result + shippingCompany.hashCode();
         return result;
     }
 

@@ -13,21 +13,13 @@ class ProductTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product("seller", "", "", "1.0", 0, Product.State.GOOD, null) {
+        product = new Product("H45DF2", "0FA7", "description", "brand", BigDecimal.valueOf(10), 1, Product.State.GOOD) {
             @Override
-            public BigDecimal priceCorrection() {
-                return null;
-            }
-
+            public BigDecimal priceCorrection() { return null; }
             @Override
-            public BigDecimal price() {
-                return null;
-            }
-
+            public BigDecimal price() { return null; }
             @Override
-            public Product clone() {
-                return null;
-            }
+            public Product clone() { return null; }
         };
     }
 
@@ -36,71 +28,47 @@ class ProductTest {
     }
 
     @Test
-    void getCode() {
+    void getSellerId() {
+        assertEquals("H45DF2", product.getSellerId());
     }
 
     @Test
-    void getSeller() {
-        assertEquals("seller", product.getSellerCode());
+    void getShippingCompanyId() {
+        assertEquals("0FA7", product.getShippingCompanyId());
     }
 
     @Test
-    void setAndGetDescription() {
-        var description = "description";
-        product.setDescription(description);
-        assertEquals(description, product.getDescription());
+    void getDescription() {
+        assertEquals("description", product.getDescription());
     }
 
     @Test
-    void setAndGetBrand() {
-        var brand = "brand";
-        product.setBrand(brand);
-        assertEquals(brand, product.getBrand());
+    void getBrand() {
+        assertEquals("brand", product.getBrand());
     }
 
     @Test
     void setAndGetBasePrice() {
-        var basePrice = "1.0";
-        product.setBasePrice(basePrice);
-        assertEquals(new BigDecimal(basePrice), product.getBasePrice());
+        assertEquals(0, BigDecimal.valueOf(10).compareTo(product.getBasePrice()));
     }
 
     @Test
-    void setGetAndIncrementNumberOfPreviousOwners() {
-        var numberOfPreviousOwners = 42;
-        product.setNumberOfPreviousOwners(numberOfPreviousOwners);
-        assertEquals(numberOfPreviousOwners, product.getNumberOfPreviousOwners());
-        product.incrementNumberOfPreviousOwners();
-        assertEquals(numberOfPreviousOwners + 1, product.getNumberOfPreviousOwners());
+    void getNumberOfPreviousOwners() {
+        assertEquals(1, product.getNumberOfPreviousOwners());
     }
 
     @Test
-    void setAndGetState() {
-        Product.State state = Product.State.NEW_WITH_TAG;
-        product.setState(state);
-        assertEquals(state, product.getState());
-    }
-
-    @Test
-    void setAndGetShippingCompany() {
-        var shippingCompany = new ShippingCompany();
-        product.setShippingCompany(shippingCompany);
-        assertEquals(shippingCompany, product.getShippingCompany());
+    void getState() {
+        assertEquals(Product.State.GOOD, product.getState());
     }
 
     @Test
     void isNew() {
-        product.setNumberOfPreviousOwners(0);
-        assertTrue(product.isNew());
-        product.setNumberOfPreviousOwners(1);
         assertFalse(product.isNew());
     }
 
     @Test
     void isUsed() {
-        product.setNumberOfPreviousOwners(0);
-        assertFalse(product.isUsed());
-        product.setNumberOfPreviousOwners(1);
         assertTrue(product.isUsed());
     }
 }

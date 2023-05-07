@@ -22,7 +22,7 @@ class PremiumSneakerTest {
 
     @Test
     void priceCorrection() {
-        PremiumSneaker premiumSneaker = new PremiumSneaker("", "", "", "10.0", 0, Product.State.GOOD, null, 38, Color.BLACK, true, Year.of(2019), "0.2");
+        PremiumSneaker premiumSneaker = new PremiumSneaker("", "", "", "", BigDecimal.valueOf(10), 0, Product.State.GOOD, 38, Color.BLACK, true, Year.of(2019), "0.2");
         assertEquals(0, new BigDecimal("1.2").pow(4).compareTo(premiumSneaker.priceCorrection()));
     }
 }

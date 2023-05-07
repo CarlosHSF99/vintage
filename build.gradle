@@ -27,3 +27,10 @@ jar {
 apply plugin: 'application'
 
 mainClassName = 'Main'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+

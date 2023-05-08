@@ -1,10 +1,8 @@
 package model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,6 +18,8 @@ public class User {
     private final Map<String, Product> cart;
     private String email;
     private String address;
+    private BigDecimal revenue;
+    private BigDecimal spending;
 
     public User(String email, String name, String address, String taxNumber) {
         this.id = nextAlphanumericId();
@@ -31,6 +31,8 @@ public class User {
         this.ordersMade = new HashMap<>();
         this.ordersReceived = new HashMap<>();
         this.cart = new HashMap<>();
+        this.revenue = BigDecimal.ZERO;
+        this.spending = BigDecimal.ZERO;
     }
 
     private User(User other) {
@@ -45,6 +47,8 @@ public class User {
         this.cart = other.cart.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        this.revenue = other.revenue;
+        this.spending = other.spending;
     }
 
     public String getId() {
@@ -89,19 +93,18 @@ public class User {
         cart.remove(product.getId());
     }
 
-
     public void clearCart() {
         cart.clear();
+    }
+
+    public List<Product> getCart() {
+        return cart.values().stream().map(Product::clone).toList();
     }
 
     public List<Product> returnCart() {
         var products = cart.values().stream().map(Product::clone).toList();
         cart.clear();
         return products;
-    }
-
-    public List<Product> getCart() {
-        return cart.values().stream().map(Product::clone).toList();
     }
 
     public void addProductSelling(Product product) {
@@ -114,19 +117,21 @@ public class User {
 
     public void addOrderMade(Order order) {
         ordersMade.put(order.getId(), order);
+        spending = spending.add(order.productsCost());
     }
 
     public void addOrdersMade(List<Order> orders) {
-        orders.forEach(order -> ordersMade.put(order.getId(), order));
+        orders.forEach(this::addOrderMade);
     }
 
     public void addOrderReceived(Order order) {
         ordersReceived.put(order.getId(), order);
         order.getProducts().stream().map(Product::getId).forEach(products.keySet()::remove);
+        revenue = revenue.add(order.productsCost());
     }
 
     public void addOrdersReceived(List<Order> orders) {
-        orders.forEach(this::addOrderMade);
+        orders.forEach(this::addOrderReceived);
     }
 
     public List<Product> getProducts() {
@@ -165,8 +170,30 @@ public class User {
         return products.values().stream().map(Product::clone).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public BigDecimal revenue() {
-        return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal getRevenue() {
+        return revenue;
+        // return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getRevenue(LocalDateTime from, LocalDateTime to) {
+        return ordersReceived.values()
+                .stream()
+                .filter(order -> order.getCreationDate().isAfter(from) && order.getCreationDate().isBefore(to))
+                .map(Order::sellerRevenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getSpending() {
+        return spending;
+        // return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getSpending(LocalDateTime from, LocalDateTime to) {
+        return ordersMade.values()
+                .stream()
+                .filter(order -> order.getCreationDate().isAfter(from) && order.getCreationDate().isBefore(to))
+                .map(Order::sellerRevenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private String nextAlphanumericId() {
@@ -176,15 +203,17 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "code='" + id + '\'' +
+                "id='" + id + '\'' +
                 ", taxNumber='" + taxNumber + '\'' +
                 ", name='" + name + '\'' +
-                ", productsSelling=" + products +
+                ", products=" + products +
                 ", ordersMade=" + ordersMade +
                 ", ordersReceived=" + ordersReceived +
                 ", cart=" + cart +
                 ", email='" + email + '\'' +
                 ", address='" + address + '\'' +
+                ", revenue=" + revenue +
+                ", spending=" + spending +
                 '}';
     }
 
@@ -203,12 +232,14 @@ public class User {
         int result = id.hashCode();
         result = 31 * result + taxNumber.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + email.hashCode();
-        result = 31 * result + address.hashCode();
         result = 31 * result + products.hashCode();
         result = 31 * result + ordersMade.hashCode();
         result = 31 * result + ordersReceived.hashCode();
         result = 31 * result + cart.hashCode();
+        result = 31 * result + email.hashCode();
+        result = 31 * result + address.hashCode();
+        result = 31 * result + revenue.hashCode();
+        result = 31 * result + spending.hashCode();
         return result;
     }
 

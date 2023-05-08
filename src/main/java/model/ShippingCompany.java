@@ -47,6 +47,10 @@ public class ShippingCompany {
         revenue = revenue.add(shippingCost(order.getProducts().size()));
     }
 
+    public BigDecimal getRevenue() {
+        return revenue;
+    }
+
     public BigDecimal shippingCost(long numberOfProducts) {
         if (numberOfProducts == 1) {
             return baseValueSmall.multiply(BigDecimal.ONE.add(fee));

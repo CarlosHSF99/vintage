@@ -2,10 +2,10 @@ package model;
 
 import exceptions.ProductInCartUnavailable;
 
+import javax.print.attribute.standard.PresentationDirection;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Vintage {
@@ -17,6 +17,7 @@ public class Vintage {
     private final Map<String, User> users;
     private final Map<String, Order> orders;
     private final Map<String, ShippingCompany> shippingCompanies;
+    private BigDecimal revenue;
 
     public Vintage(String baseValueSmall, String baseValueMedium, String baseValueBig, String orderFee) {
         this.baseValueSmall = new BigDecimal(baseValueSmall);
@@ -25,8 +26,9 @@ public class Vintage {
         this.orderFee = new BigDecimal(orderFee);
         this.products = new HashMap<>();
         this.users = new HashMap<>();
-        this.orders = new HashMap<>();
+        this.orders = new LinkedHashMap<>();
         this.shippingCompanies = new HashMap<>();
+        this.revenue = BigDecimal.ZERO;
     }
 
     public void registerUser(String email, String name, String address, String taxNumber) {
@@ -54,9 +56,9 @@ public class Vintage {
         }
     }
 
-    public void orderUserCart(String buyerCode) throws ProductInCartUnavailable {
+    public void orderUserCart(String buyerId) throws ProductInCartUnavailable {
         // get buying user
-        User buyer = users.get(buyerCode);
+        User buyer = users.get(buyerId);
 
         // get cart from buying user
         List<Product> cart = buyer.returnCart();
@@ -73,27 +75,57 @@ public class Vintage {
         cart.stream().map(Product::getId).forEach(products.keySet()::remove);
 
         // auxiliary (seller code, shipping company) pair
-        record SellerShippingCompanyPair(String sellerCode, ShippingCompany shippingCompany) {
+        record SellerShippingCompanyPair(String sellerId, String shippingCompanyId) {
         }
 
         // generate and distribute orders
         cart.stream()
                 .map(Product::clone)
-                .collect(Collectors.groupingBy(p -> new SellerShippingCompanyPair(p.getSellerCode(), p.getShippingCompany())))
+                .collect(Collectors.groupingBy(p -> new SellerShippingCompanyPair(p.getSellerId(), p.getShippingCompanyId())))
                 .entrySet()
                 .stream()
-                .map(e -> new Order(e.getValue(), e.getKey().sellerCode, buyerCode, e.getKey().shippingCompany))
+                .map(e -> new Order(e.getValue(), buyerId, e.getKey().sellerId, e.getKey().shippingCompanyId, shippingCompanies.get(e.getKey().shippingCompanyId)
+                        .shippingCost(e.getValue().size())))
                 .forEach(order -> {
                     orders.put(order.getId(), order);
                     buyer.addOrderMade(order);
                     users.get(order.getSellerId()).addOrderReceived(order);
-                    order.getShippingCompany().addOrder(order);
+                    shippingCompanies.get(order.getShippingCompanyId()).addOrder(order);
+                    revenue = revenue.add(order.vintageFees());
                 });
     }
 
-    public void returnOrder(String orderCode) {
-        if (orders.containsKey(orderCode)) {
-            orders.get(orderCode).setAsReturned();
+    public void returnOrder(String orderId) {
+        if (orders.containsKey(orderId)) {
+            orders.get(orderId).setAsReturned();
         }
+    }
+
+    public Optional<User> userWithMostRevenue() {
+        return users.values().stream().max(Comparator.comparing(User::getRevenue));
+    }
+
+    public Optional<User> userWithMostRevenue(LocalDateTime from, LocalDateTime to) {
+        return users.values().stream().max(Comparator.comparing(user -> user.getRevenue(from, to))).map(User::clone);
+    }
+
+    public Optional<ShippingCompany> shippingCompanyMostRevenue() {
+        return shippingCompanies.values().stream().max(Comparator.comparing(ShippingCompany::getRevenue));
+    }
+
+    public List<Order> userIssuedOrders(String userId) {
+        return users.get(userId).getOrdersMade().stream().map(Order::clone).toList();
+    }
+
+    public List<User> topSellerInInterval(LocalDateTime from, LocalDateTime to) {
+        return users.values().stream().sorted(Comparator.comparing(user -> user.getRevenue(from, to))).toList();
+    }
+
+    public List<User> topBuyerInInterval(LocalDateTime from, LocalDateTime to) {
+        return users.values().stream().sorted(Comparator.comparing(user -> user.getSpending(from, to))).toList();
+    }
+
+    public BigDecimal getRevenue() {
+        return revenue;
     }
 }

@@ -19,11 +19,11 @@ class SneakerTest {
 
     @BeforeEach
     void setUp() {
-        sneaker = new Sneaker("0AV7E", "description", "brand", "10.0", 0, Product.State.NEW_WITH_TAG, null, 38, Color.BLACK, true, Year.of(2020), "0.2");
-        newSize40Sneaker = new Sneaker("", "", "", "10.0", 0, Product.State.NEW_WITH_TAG, null, 40, Color.BLACK, true, Year.now(), "0.2");;
-        usedSize40Sneaker = new Sneaker("", "", "", "10.0", 1, Product.State.NEW_WITH_TAG, null, 40, Color.BLACK, true, Year.now(), "0.2");;;
-        newSize50Sneaker = new Sneaker("", "", "", "10.0", 0, Product.State.NEW_WITH_TAG, null, 50, Color.BLACK, true, Year.now(), "0.2");;;
-        usedSize50Sneaker = new Sneaker("", "", "", "10.0", 1, Product.State.NEW_WITH_TAG, null, 50, Color.BLACK, true, Year.now(), "0.2");;;
+        sneaker = new Sneaker("0AV7E", "8RT21", "description", "brand", BigDecimal.valueOf(10), 0, Product.State.NEW_WITH_TAG, 38, Color.BLACK, true, Year.of(2020), "0.2");
+        newSize40Sneaker = new Sneaker("", "", "", "", BigDecimal.valueOf(10), 0, Product.State.NEW_WITH_TAG, 40, Color.BLACK, true, Year.now(), "0.2");;
+        usedSize40Sneaker = new Sneaker("", "", "", "", BigDecimal.valueOf(10), 1, Product.State.NEW_WITH_TAG, 40, Color.BLACK, true, Year.now(), "0.2");;;
+        newSize50Sneaker = new Sneaker("", "", "", "", BigDecimal.valueOf(10), 0, Product.State.NEW_WITH_TAG, 50, Color.BLACK, true, Year.now(), "0.2");;;
+        usedSize50Sneaker = new Sneaker("", "", "", "", BigDecimal.valueOf(10), 1, Product.State.NEW_WITH_TAG, 50, Color.BLACK, true, Year.now(), "0.2");;;
     }
 
     @AfterEach

@@ -6,8 +6,8 @@ import java.math.BigDecimal;
  * TShirt class
  */
 public class TShirt extends Product {
-    private Size size;
-    private Pattern pattern;
+    private final Size size;
+    private final Pattern pattern;
 
     /**
      * Parameterized constructor
@@ -43,16 +43,8 @@ public class TShirt extends Product {
         return size;
     }
 
-    public void setSize(Size size) {
-        this.size = size;
-    }
-
     public Pattern getPattern() {
         return pattern;
-    }
-
-    public void setPattern(Pattern pattern) {
-        this.pattern = pattern;
     }
 
     /**

@@ -5,9 +5,9 @@ import java.math.RoundingMode;
 import java.time.Year;
 
 public class Handbag extends Product {
-    private double dimension;
-    private String material;
-    private Year collectionYear;
+    private final double dimension;
+    private final String material;
+    private final Year collectionYear;
 
     public Handbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, double dimension, String material, Year collectionYear) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
@@ -27,24 +27,12 @@ public class Handbag extends Product {
         return dimension;
     }
 
-    public void setDimension(double dimension) {
-        this.dimension = dimension;
-    }
-
     public String getMaterial() {
         return material;
     }
 
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-
     public Year getCollectionYear() {
         return collectionYear;
-    }
-
-    public void setCollectionYear(Year collectionYear) {
-        this.collectionYear = collectionYear;
     }
 
     @Override

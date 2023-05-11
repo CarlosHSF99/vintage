@@ -31,37 +31,28 @@ class SneakerTest {
     }
 
     @Test
-    void setAndGetSize() {
-        int size = 40;
-        sneaker.setSize(size);
-        assertEquals(size, sneaker.getSize());
+    void getSize() {
+        assertEquals(38, sneaker.getSize());
     }
 
     @Test
-    void setAndGetColor() {
-        Color color = Color.RED;
-        sneaker.setColor(color);
-        assertEquals(color, sneaker.getColor());
+    void getColor() {
+        assertEquals(Color.BLACK, sneaker.getColor());
     }
 
     @Test
-    void setAndHasLaces() {
-        sneaker.setLaces(false);
-        assertFalse(sneaker.hasLaces());
+    void hasLaces() {
+        assertTrue(sneaker.hasLaces());
     }
 
     @Test
-    void setAndGetCollectionYear() {
-        Year year = Year.now();
-        sneaker.setCollectionYear(year);
-        assertEquals(year, sneaker.getCollectionYear());
+    void getCollectionYear() {
+        assertEquals(Year.of(2020), sneaker.getCollectionYear());
     }
 
     @Test
     void setAndGetSellerPriceCorrection() {
-        String discount = "0.25";
-        sneaker.setSellerPriceCorrection(new BigDecimal(discount));
-        assertEquals(0, new BigDecimal(discount).compareTo(sneaker.getSellerPriceCorrection()));
+        assertEquals(0, new BigDecimal("0.2").compareTo(sneaker.getSellerPriceCorrection()));
     }
 
     @Test

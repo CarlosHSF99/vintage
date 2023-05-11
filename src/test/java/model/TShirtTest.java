@@ -33,25 +33,13 @@ class TShirtTest {
     }
 
     @Test
-    void setAndGetSize() {
-        tshirt.setSize(Size.S);
+    void getSize() {
         assertEquals(Size.S, tshirt.getSize());
-        tshirt.setSize(Size.M);
-        assertEquals(Size.M, tshirt.getSize());
-        tshirt.setSize(Size.L);
-        assertEquals(Size.L, tshirt.getSize());
-        tshirt.setSize(Size.XL);
-        assertEquals(Size.XL, tshirt.getSize());
     }
 
     @Test
     void setAndGetPattern() {
-        tshirt.setPattern(TShirt.Pattern.PLAIN);
         assertEquals(TShirt.Pattern.PLAIN, tshirt.getPattern());
-        tshirt.setPattern(TShirt.Pattern.STRIPES);
-        assertEquals(TShirt.Pattern.STRIPES, tshirt.getPattern());
-        tshirt.setPattern(TShirt.Pattern.PALM_TREES);
-        assertEquals(TShirt.Pattern.PALM_TREES, tshirt.getPattern());
     }
 
     @Test

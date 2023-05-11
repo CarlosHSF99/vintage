@@ -7,14 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class PremiumHandbagTest {
 
     @Test
-    void getType() {
-    }
-
-    @Test
-    void setType() {
-    }
-
-    @Test
     void priceCorrection() {
     }
 

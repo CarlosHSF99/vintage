@@ -14,7 +14,7 @@ class HandbagTest {
 
     @BeforeEach
     void setUp() {
-        handbag = new Handbag("seller", "shippingCompany", "description", "brand", BigDecimal.ONE, 0, Product.State.GOOD, 1.0, "stone", Year.of(2020));
+        handbag = new Handbag("seller", "shippingCompany", "description", "brand", BigDecimal.ONE, 0, Product.State.GOOD, 4.0, "stone", Year.of(2020));
     }
 
     @AfterEach
@@ -22,10 +22,8 @@ class HandbagTest {
     }
 
     @Test
-    void setAndGetDimension() {
-        var dimension = 10.0;
-        handbag.setDimension(dimension);
-        assertEquals(dimension, handbag.getDimension());
+    void getDimension() {
+        assertEquals(4.0, handbag.getDimension());
     }
 
     @Test
@@ -37,17 +35,12 @@ class HandbagTest {
     }
 
     @Test
-    void setAndGetCollectionYear() {
-        Year year = Year.of(2016);
-        handbag.setCollectionYear(year);
-        assertEquals(year, handbag.getCollectionYear());
+    void getCollectionYear() {
+        assertEquals(Year.of(2020), handbag.getCollectionYear());
     }
 
     @Test
     void priceCorrection() {
-        handbag.setDimension(2.0);
-        assertEquals(0, new BigDecimal("0.5").compareTo(handbag.priceCorrection()));
-        handbag.setDimension(4.0);
         assertEquals(0, new BigDecimal("0.75").compareTo(handbag.priceCorrection()));
     }
 

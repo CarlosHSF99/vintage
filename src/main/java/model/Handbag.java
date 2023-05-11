@@ -9,8 +9,8 @@ public class Handbag extends Product {
     private String material;
     private Year collectionYear;
 
-    public Handbag(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, double dimension, String material, Year collectionYear) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
+    public Handbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, double dimension, String material, Year collectionYear) {
+        super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
         this.dimension = dimension;
         this.material = material;
         this.collectionYear = collectionYear;

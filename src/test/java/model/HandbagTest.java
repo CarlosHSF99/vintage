@@ -14,7 +14,7 @@ class HandbagTest {
 
     @BeforeEach
     void setUp() {
-        handbag = new Handbag("seller", "description", "brand", "1", 0, Product.State.GOOD, null, 1.0, "stone", Year.of(2020));
+        handbag = new Handbag("seller", "shippingCompany", "description", "brand", BigDecimal.ONE, 0, Product.State.GOOD, 1.0, "stone", Year.of(2020));
     }
 
     @AfterEach

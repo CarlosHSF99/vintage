@@ -17,21 +17,21 @@ public class Sneaker extends Product {
     /**
      * Parameterized constructor
      *
-     * @param seller                 Seller identification code
+     * @param sellerId               Seller identification code
+     * @param shippingCompanyId      Sneaker assigned shipping company id
      * @param description            Sneaker description
      * @param brand                  Sneaker brand
      * @param basePrice              Sneaker base price
      * @param numberOfPreviousOwners Sneaker number of previous owners
      * @param state                  Sneaker state
-     * @param shippingCompany        Sneaker assigned shipping company
      * @param size                   Sneaker size
      * @param color                  Sneaker color
      * @param laces                  Sneaker laces
      * @param collectionYear         Sneaker collection year
      * @param discount               Sneaker discount defined by seller
      */
-    public Sneaker(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, int size, Color color, boolean laces, Year collectionYear, String discount) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
+    public Sneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, String discount) {
+        super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
         this.size = size;
         this.color = color;
         this.laces = laces;

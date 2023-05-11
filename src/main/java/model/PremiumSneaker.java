@@ -12,21 +12,21 @@ public class PremiumSneaker extends Sneaker implements Premium {
     /**
      * Parameterized constructor.
      *
-     * @param seller                 Seller identification code
+     * @param sellerId               Seller identification code
+     * @param shippingCompanyId      Sneaker assigned shipping company
      * @param description            Sneaker description
      * @param brand                  Sneaker brand
      * @param basePrice              Sneaker base price
      * @param numberOfPreviousOwners Sneaker number of previous owners
      * @param state                  Sneaker state
-     * @param shippingCompany        Sneaker assigned shipping company
      * @param size                   Sneaker size
      * @param color                  Sneaker color
      * @param laces                  Sneaker laces
      * @param collectionYear         Sneaker collection year
      * @param appreciation           Sneaker appreciation defined by seller
      */
-    public PremiumSneaker(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, int size, Color color, boolean laces, Year collectionYear, String appreciation) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany, size, color, laces, collectionYear, appreciation);
+    public PremiumSneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, String appreciation) {
+        super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state, size, color, laces, collectionYear, appreciation);
     }
 
     /**

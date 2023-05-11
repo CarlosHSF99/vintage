@@ -12,18 +12,18 @@ public class TShirt extends Product {
     /**
      * Parameterized constructor
      *
-     * @param seller                 Seller identification code
+     * @param sellerId               Seller identification code
+     * @param shippingCompanyId      TShirt assigned shipping company
      * @param description            TShirt description
      * @param brand                  TShirt brand
      * @param basePrice              TShirt base price
      * @param numberOfPreviousOwners TShirt number of previous owners
      * @param state                  TShirt state
-     * @param shippingCompany        TShirt assigned shipping company
      * @param size                   TShirt size
      * @param pattern                TShirt pattern
      */
-    public TShirt(String seller, String description, String brand, String basePrice, int numberOfPreviousOwners, State state, ShippingCompany shippingCompany, Size size, Pattern pattern) {
-        super(seller, description, brand, basePrice, numberOfPreviousOwners, state, shippingCompany);
+    public TShirt(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, Size size, Pattern pattern) {
+        super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
         this.size = size;
         this.pattern = pattern;
     }

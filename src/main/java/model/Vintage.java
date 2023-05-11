@@ -41,7 +41,7 @@ public class Vintage {
     }
 
     public void registerPremiumShippingCompany(String name, BigDecimal profitMargin, BigDecimal premiumTax) {
-        ShippingCompany newShippingCompany = new ShippingCompanyPremium(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee,profitMargin, premiumTax);
+        ShippingCompany newShippingCompany = new PremiumShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee,profitMargin, premiumTax);
         shippingCompanies.put(newShippingCompany.getId(), newShippingCompany);
     }
 

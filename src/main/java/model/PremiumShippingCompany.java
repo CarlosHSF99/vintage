@@ -2,15 +2,15 @@ package model;
 
 import java.math.BigDecimal;
 
-public class ShippingCompanyPremium extends ShippingCompany implements Premium {
+public class PremiumShippingCompany extends ShippingCompany implements Premium {
     private BigDecimal premiumTax;
 
-    public ShippingCompanyPremium(String name, BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal fee, BigDecimal profitMargin, BigDecimal premiumTax) {
+    public PremiumShippingCompany(String name, BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal fee, BigDecimal profitMargin, BigDecimal premiumTax) {
         super(name, baseValueSmall, baseValueMedium, baseValueBig, fee, profitMargin);
         this.premiumTax = premiumTax;
     }
 
-    public ShippingCompanyPremium(ShippingCompanyPremium other) {
+    public PremiumShippingCompany(PremiumShippingCompany other) {
         super(other);
         this.premiumTax = other.premiumTax;
     }
@@ -45,7 +45,7 @@ public class ShippingCompanyPremium extends ShippingCompany implements Premium {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        ShippingCompanyPremium that = (ShippingCompanyPremium) o;
+        PremiumShippingCompany that = (PremiumShippingCompany) o;
 
         return premiumTax.equals(that.premiumTax);
     }
@@ -58,7 +58,7 @@ public class ShippingCompanyPremium extends ShippingCompany implements Premium {
     }
 
     @Override
-    public ShippingCompanyPremium clone() {
-        return new ShippingCompanyPremium(this);
+    public PremiumShippingCompany clone() {
+        return new PremiumShippingCompany(this);
     }
 }

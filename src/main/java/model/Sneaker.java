@@ -57,40 +57,20 @@ public class Sneaker extends Product {
         return size;
     }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
-
     public Color getColor() {
         return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     public boolean hasLaces() {
         return laces;
     }
 
-    public void setLaces(boolean laces) {
-        this.laces = laces;
-    }
-
     public Year getCollectionYear() {
         return collectionYear;
     }
 
-    public void setCollectionYear(Year collectionYear) {
-        this.collectionYear = collectionYear;
-    }
-
     public BigDecimal getSellerPriceCorrection() {
         return sellerPriceCorrection;
-    }
-
-    public void setSellerPriceCorrection(BigDecimal sellerPriceCorrection) {
-        this.sellerPriceCorrection = sellerPriceCorrection;
     }
 
     /**

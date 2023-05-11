@@ -48,7 +48,7 @@ class ProductTest {
     }
 
     @Test
-    void setAndGetBasePrice() {
+    void getBasePrice() {
         assertEquals(0, BigDecimal.valueOf(10).compareTo(product.getBasePrice()));
     }
 

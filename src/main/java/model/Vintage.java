@@ -2,7 +2,6 @@ package model;
 
 import exceptions.ProductInCartUnavailable;
 
-import javax.print.attribute.standard.PresentationDirection;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -36,8 +35,13 @@ public class Vintage {
         users.put(user.getId(), user);
     }
 
-    public void registerShippingCompany(String name, boolean premium) {
-        ShippingCompany newShippingCompany = premium ? new ShippingCompanyPremium(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee) : new ShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee);
+    public void registerShippingCompany(String name, BigDecimal profitMargin) {
+        ShippingCompany newShippingCompany = new ShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee, profitMargin);
+        shippingCompanies.put(newShippingCompany.getId(), newShippingCompany);
+    }
+
+    public void registerPremiumShippingCompany(String name, BigDecimal profitMargin, BigDecimal premiumTax) {
+        ShippingCompany newShippingCompany = new ShippingCompanyPremium(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee,profitMargin, premiumTax);
         shippingCompanies.put(newShippingCompany.getId(), newShippingCompany);
     }
 
@@ -97,7 +101,10 @@ public class Vintage {
 
     public void returnOrder(String orderId) {
         if (orders.containsKey(orderId)) {
-            orders.get(orderId).setAsReturned();
+            Order returnedOrder = orders.get(orderId);
+            returnedOrder.setAsReturned();
+            users.get(returnedOrder.getBuyerId()).orderMadeReturned(orderId);
+            users.get(returnedOrder.getSellerId()).orderReceivedReturned(orderId);
         }
     }
 

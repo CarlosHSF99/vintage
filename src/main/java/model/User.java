@@ -196,6 +196,14 @@ public class User {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public void orderMadeReturned(String orderId) {
+        spending = spending.subtract(ordersMade.get(orderId).totalCost());
+    }
+
+    public void orderReceivedReturned(String orderId) {
+        revenue = revenue.subtract(ordersReceived.get(orderId).productsCost());
+    }
+
     private String nextAlphanumericId() {
         return String.format("%6s", Long.toString(numberOfUsers++, 36)).replace(' ', '0');
     }

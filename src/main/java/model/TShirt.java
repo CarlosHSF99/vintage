@@ -57,6 +57,11 @@ public class TShirt extends Product {
     }
 
     @Override
+    public String show() {
+        return "T-Shirt | " + getBrand() + " | " + getState() + " | " + getDescription() + " | " + getPattern() + " | Price: " + price() + " | nº prev. owners: " + getNumberOfPreviousOwners();
+    }
+
+    @Override
     public String toString() {
         return "TShirt{" +
                 super.toString() +
@@ -90,7 +95,7 @@ public class TShirt extends Product {
         return new TShirt(this);
     }
 
-    enum Pattern {
+    public enum Pattern {
         PLAIN("1.0"), STRIPES("0.5"), PALM_TREES("0.5");
 
         private final BigDecimal value;

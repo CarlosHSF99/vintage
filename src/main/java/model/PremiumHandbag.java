@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit;
 public class PremiumHandbag extends Handbag implements Premium {
     private final BigDecimal appreciationRate;
 
-    public PremiumHandbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, double dimension, String material, Year collectionYear, BigDecimal appreciationRate) {
+    public PremiumHandbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, BigDecimal dimension, Material material, Year collectionYear, BigDecimal appreciationRate) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state, dimension, material, collectionYear);
         this.appreciationRate = appreciationRate;
     }
@@ -25,6 +25,11 @@ public class PremiumHandbag extends Handbag implements Premium {
     public BigDecimal priceCorrection() {
         return super.priceCorrection()
                 .multiply(appreciationRate.pow((int) getCollectionYear().until(Year.now(), ChronoUnit.YEARS)));
+    }
+
+    @Override
+    public String show() {
+        return null;
     }
 
     @Override

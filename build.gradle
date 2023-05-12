@@ -34,3 +34,7 @@ java {
     }
 }
 
+run {
+    standardInput = System.in
+}
+

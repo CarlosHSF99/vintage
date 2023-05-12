@@ -46,6 +46,10 @@ public class ShippingCompany {
         return this.id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public BigDecimal getProfitMargin() {
         return profitMargin;
     }

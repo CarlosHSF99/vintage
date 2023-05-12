@@ -18,6 +18,18 @@ public class Vintage {
     private final Map<String, ShippingCompany> shippingCompanies;
     private BigDecimal revenue;
 
+    public Vintage(BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal orderFee) {
+        this.baseValueSmall = baseValueSmall;
+        this.baseValueMedium = baseValueMedium;
+        this.baseValueBig = baseValueBig;
+        this.orderFee = orderFee;
+        this.products = new HashMap<>();
+        this.users = new HashMap<>();
+        this.orders = new LinkedHashMap<>();
+        this.shippingCompanies = new HashMap<>();
+        this.revenue = BigDecimal.ZERO;
+    }
+
     public Vintage(String baseValueSmall, String baseValueMedium, String baseValueBig, String orderFee) {
         this.baseValueSmall = new BigDecimal(baseValueSmall);
         this.baseValueMedium = new BigDecimal(baseValueMedium);
@@ -45,10 +57,10 @@ public class Vintage {
         shippingCompanies.put(newShippingCompany.getId(), newShippingCompany);
     }
 
-    public void publishProduct(String userCode, Product product) {
+    public void publishProduct(String userId, Product product) {
         Product productCopy = product.clone();
         products.put(product.getId(), productCopy);
-        users.computeIfPresent(userCode, (k, v) -> {
+        users.computeIfPresent(userId, (k, v) -> {
             v.addProductSelling(productCopy);
             return v;
         });
@@ -58,6 +70,18 @@ public class Vintage {
         if (products.containsKey(productCode) || users.containsKey(userCode)) {
             users.get(userCode).addProductToCart(products.get(productCode));
         }
+    }
+
+    public List<Product> getProducts() {
+        return products.values().stream().map(Product::clone).toList();
+    }
+
+    public List<ShippingCompany> getShippingCompanies() {
+        return shippingCompanies.values().stream().map(ShippingCompany::clone).toList();
+    }
+
+    public Optional<String> getUserIdByEmail(String email) {
+        return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst().map(User::getEmail);
     }
 
     public void orderUserCart(String buyerId) throws ProductInCartUnavailable {

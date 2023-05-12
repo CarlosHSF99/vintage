@@ -30,13 +30,13 @@ public class Sneaker extends Product {
      * @param collectionYear         Sneaker collection year
      * @param discount               Sneaker discount defined by seller
      */
-    public Sneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, String discount) {
+    public Sneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, BigDecimal discount) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
         this.size = size;
         this.color = color;
         this.laces = laces;
         this.collectionYear = collectionYear;
-        this.sellerPriceCorrection = new BigDecimal(discount);
+        this.sellerPriceCorrection = discount;
     }
 
     /**
@@ -81,6 +81,11 @@ public class Sneaker extends Product {
      */
     public BigDecimal priceCorrection() {
         return isUsed() || size > 45 ? BigDecimal.ONE.subtract(sellerPriceCorrection) : BigDecimal.ONE;
+    }
+
+    @Override
+    public String show() {
+        return null;
     }
 
     @Override

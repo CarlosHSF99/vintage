@@ -122,6 +122,8 @@ public abstract class Product {
         return basePrice.multiply(priceCorrection());
     }
 
+    public abstract String show();
+
     private String nextAlphanumericId() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
@@ -176,7 +178,7 @@ public abstract class Product {
     /**
      * State enum
      */
-    enum State {
+    public enum State {
         NEW_WITH_TAG("1.0"),
         NEW_WITHOUT_TAG("0.9"),
         VERY_GOOD("0.8"),

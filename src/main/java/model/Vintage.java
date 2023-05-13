@@ -5,6 +5,7 @@ import exceptions.ProductInCartUnavailable;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ public class Vintage implements Serializable {
     private final Map<String, Order> orders;
     private final Map<String, ShippingCompany> shippingCompanies;
     private BigDecimal revenue;
+    private Clock clockMemento;
 
     public Vintage(BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal orderFee) {
         this.baseValueSmall = baseValueSmall;
@@ -54,7 +56,7 @@ public class Vintage implements Serializable {
     }
 
     public void registerPremiumShippingCompany(String name, BigDecimal profitMargin, BigDecimal premiumTax) {
-        ShippingCompany newShippingCompany = new PremiumShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee,profitMargin, premiumTax);
+        ShippingCompany newShippingCompany = new PremiumShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee, profitMargin, premiumTax);
         shippingCompanies.put(newShippingCompany.getId(), newShippingCompany);
     }
 
@@ -82,7 +84,27 @@ public class Vintage implements Serializable {
     }
 
     public Optional<String> getUserIdByEmail(String email) {
-        return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst().map(User::getEmail);
+        return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst().map(User::getId);
+    }
+
+    public Optional<User> getUser(String userId) {
+        return Optional.ofNullable(users.get(userId)).map(User::clone);
+    }
+
+    public Optional<String> getShippingCompanyIdByName(String name) {
+        return shippingCompanies.values()
+                .stream()
+                .filter(shippingCompany -> shippingCompany.getName().equals(name))
+                .findFirst()
+                .map(ShippingCompany::getId);
+    }
+
+    public List<Order> getShippingCompanyUndeliveredOrders(String shippingCompanyId) {
+        return shippingCompanies.get(shippingCompanyId).getUndeliveredOrders();
+    }
+
+    public void deliverOrder(String orderId) {
+        orders.get(orderId).deliver();
     }
 
     public void orderUserCart(String buyerId) throws ProductInCartUnavailable {
@@ -159,5 +181,13 @@ public class Vintage implements Serializable {
 
     public BigDecimal getRevenue() {
         return revenue;
+    }
+
+    public void saveTimeSimulationMemento(Clock clockMemento) {
+        this.clockMemento = clockMemento;
+    }
+
+    public Clock getTimeSimulationMemento() {
+        return clockMemento;
     }
 }

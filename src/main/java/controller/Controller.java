@@ -5,8 +5,9 @@ import model.*;
 import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.Year;
+import java.sql.Time;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -18,15 +19,17 @@ public class Controller {
 
     private static final int REGISTER_USER = 1;
     private static final int REGISTER_SHIPPING_COMPANY = 2;
-    private static final int LOGIN = 3;
-    private static final int SAVE_SYSTEM = 4;
-    private static final int ADVANCE_TIME = 5;
+    private static final int USER_LOGIN = 3;
+    private static final int SHIPPING_COMPANY_LOGIN = 4;
+    private static final int SAVE_SYSTEM = 5;
+    private static final int ADVANCE_TIME = 6;
 
     private static final int PUBLISH_PRODUCT = 1;
     private static final int ADD_PRODUCT_TO_CART = 2;
     private static final int ORDER_CART = 3;
-    private static final int CLEAR_CART = 4;
-    private static final int RETURN_ORDER = 5;
+    private static final int RETURN_ORDER = 4;
+
+    private static final int DELIVER = 1;
 
     private static final int SNEAKER = 1;
     private static final int T_SHIRT = 2;
@@ -51,14 +54,16 @@ public class Controller {
     private final Vintage model;
     private final Scanner sc;
     private String userId;
+    private String shippingCompanyId;
 
     public Controller() {
         this.sc = new Scanner(System.in);
         this.userId = null;
 
-        System.out.println("VINTAGE");
+        System.out.println("VINTAGE - " + now());
         System.out.println("  1. New System");
         System.out.println("  2. Load System");
+        System.out.println("  0. Exit");
         System.out.print("  Answer: ");
 
         int option = sc.nextInt();
@@ -66,7 +71,7 @@ public class Controller {
 
         switch (option) {
             case NEW_SYSTEM -> {
-                System.out.println("\nSystem Initialization");
+                System.out.println("\nSystem Initialization - " + now());
                 System.out.print("  Small order expedition base cost: ");
                 var small = new BigDecimal(sc.nextLine());
                 System.out.print("  Medium order expedition base cost: ");
@@ -78,7 +83,7 @@ public class Controller {
                 this.model = new Vintage(small, medium, big, fee);
             }
             case LOAD_SYSTEM -> {
-                System.out.println("\nLoad System State");
+                System.out.println("\nLoad System State - " + now());
                 System.out.print("  Path: ");
                 String path = sc.nextLine();
                 Vintage tmp = null;
@@ -89,10 +94,15 @@ public class Controller {
                     objectIn.close();
                     fileIn.close();
                 } catch (IOException | ClassNotFoundException e) {
-                    System.out.println("Error loading system from file.");
+                    System.out.println("  Error loading system from file.");
                 }
                 this.model = tmp;
-                System.out.println(" System loaded from " + path);
+                TimeSimulation.loadTimeSimulationMemento(this.model.getTimeSimulationMemento());
+                System.out.println("  System loaded from " + path);
+            }
+            case EXIT -> {
+                this.model = null;
+                exit();
             }
             default -> {
                 this.model = null;
@@ -101,12 +111,13 @@ public class Controller {
     }
 
     public void run() {
-        System.out.println("\nVintage Main Menu");
+        System.out.println("\nVintage Main Menu - " + now());
         System.out.println("  1. Register user");
         System.out.println("  2. Register shipping company");
         System.out.println("  3. User login");
-        System.out.println("  4. Save system state");
-        System.out.println("  5. Advance time");
+        System.out.println("  4. Shipping company login");
+        System.out.println("  5. Save system state");
+        System.out.println("  6. Advance time");
         System.out.println("  0. Exit");
         System.out.print("  Answer: ");
 
@@ -114,34 +125,20 @@ public class Controller {
         sc.nextLine();
 
         switch (option) {
-            case REGISTER_USER -> {
-                signupUser();
-                run();
-            }
-            case REGISTER_SHIPPING_COMPANY -> {
-                signupShippingCompany();
-                run();
-            }
-            case LOGIN -> {
-                login();
-                run();
-            }
-            case SAVE_SYSTEM -> {
-                saveSystemState();
-                run();
-            }
-            case ADVANCE_TIME -> {
-                advanceTime();
-                run();
-            }
-            case EXIT -> {
-                exit();
-            }
+            case REGISTER_USER -> signupUser();
+            case REGISTER_SHIPPING_COMPANY -> signupShippingCompany();
+            case USER_LOGIN -> userLogin();
+            case SHIPPING_COMPANY_LOGIN -> shippingCompanyLogin();
+            case SAVE_SYSTEM -> saveSystemState();
+            case ADVANCE_TIME -> advanceTime();
+            case EXIT -> exit();
         }
+
+        run();
     }
 
     private void exit() {
-        System.out.println("\nExiting");
+        System.out.println("\nExiting - " + now());
         System.out.print("  Do you want to save before exiting? [y/n] ");
         String exitOption = sc.nextLine();
         if (exitOption.equals("y")) {
@@ -153,7 +150,7 @@ public class Controller {
     }
 
     private void advanceTime() {
-        System.out.println("\nAdvance Time");
+        System.out.println("\nAdvance Time - " + now());
         System.out.print("  Time offset: ");
         Duration duration = Duration.parse(sc.nextLine());
         TimeSimulation.advanceTime(duration);
@@ -161,11 +158,12 @@ public class Controller {
         int hours = duration.toHoursPart();
         int minutes = duration.toMinutesPart();
         int seconds = duration.toSecondsPart();
-        System.out.println("  Advanced " + days + " days, " + hours + " hours, " + minutes + " minutes and " + seconds + " seconds.");
+        System.out.println("  Advanced " + days + " day" + (days == 1 ? "" : "s") + ", " + hours + " hour" + (hours == 1 ? "" : "s") + ", " + minutes + " minute" + (minutes == 1 ? "" : "s") + " and " + seconds + " second" + (seconds == 1 ? "" : "s") + ".");
     }
 
     private void saveSystemState() {
-        System.out.println("\nSave System State");
+        model.saveTimeSimulationMemento(TimeSimulation.getClock());
+        System.out.println("\nSave System State - " + now());
         System.out.print("  Path: ");
         String path = sc.nextLine();
         try {
@@ -175,13 +173,13 @@ public class Controller {
             objectOut.close();
             fileOut.close();
         } catch (IOException e) {
-            System.out.println("Error saving the system state!");
+            System.out.println("  Error saving the system state!");
         }
         System.out.println("  System saved to " + path + ".");
     }
 
     private void signupUser() {
-        System.out.println("\nUser Signup");
+        System.out.println("\nUser Signup - " + now());
         System.out.print("  Email: ");
         String email = sc.nextLine();
         System.out.print("  Name: ");
@@ -195,7 +193,7 @@ public class Controller {
     }
 
     private void signupShippingCompany() {
-        System.out.println("\nShipping Company Signup");
+        System.out.println("\nShipping Company Signup - " + now());
         System.out.print("  Name: ");
         String name = sc.nextLine();
         System.out.print("  Profit margin: ");
@@ -215,20 +213,26 @@ public class Controller {
         System.out.println("  Shipping company " + name + " registered.");
     }
 
-    private void login() {
-        System.out.println("\nLogin");
+    private void userLogin() {
+        System.out.println("\nUser Login - " + now());
         System.out.print("  Email: ");
         userId = model.getUserIdByEmail(sc.nextLine()).orElseThrow();
         userMenu();
     }
 
+    private void shippingCompanyLogin() {
+        System.out.println("\nShipping Company Login - " + now());
+        System.out.print("  Name: ");
+        shippingCompanyId = model.getShippingCompanyIdByName(sc.nextLine()).orElseThrow();
+        shippingCompanyMenu();
+    }
+
     private void userMenu() {
-        System.out.println("\nUser Menu");
+        System.out.println("\nUser Menu - " + now());
         System.out.println("  1. Publish product");
         System.out.println("  2. Add product to cart");
         System.out.println("  3. Order cart");
-        System.out.println("  4. Clear cart");
-        System.out.println("  5. Return order");
+        System.out.println("  4. Return order");
         System.out.println("  0. Logout");
         System.out.print("  Answer: ");
 
@@ -236,49 +240,93 @@ public class Controller {
         sc.nextLine();
 
         switch (option) {
-            case PUBLISH_PRODUCT -> {
-                model.publishProduct(userId, newProduct());
-                System.out.println("  New product published.");
-            }
-            case ADD_PRODUCT_TO_CART -> {
-                int index = 1;
-                List<Product> products = model.getProducts()
-                        .stream()
-                        .filter(product -> product.getSellerId().equals(userId))
-                        .toList();
-                for (var product : products) {
-                    System.out.println("  " + index + ". " + product.show());
-                    index++;
-                }
-                System.out.print("  Choose a product: ");
-                int productOption = sc.nextInt();
-                sc.nextLine();
-                model.addProductToUserCart(userId, products.get(productOption).getId());
-            }
-            case ORDER_CART -> {
-                model.orderUserCart(userId);
-            }
-            case CLEAR_CART -> {
-                return;
-            }
+            case PUBLISH_PRODUCT -> publishProduct();
+            case ADD_PRODUCT_TO_CART -> addProductToCart();
+            case ORDER_CART -> model.orderUserCart(userId);
             case RETURN_ORDER -> {
-                return;
             }
             case EXIT -> {
                 return;
             }
         }
+
         userMenu();
     }
 
+    private void publishProduct() {
+        model.publishProduct(userId, newProduct());
+        System.out.println("  New product published.");
+    }
+
+    private void addProductToCart() {
+        int index = 1;
+        List<Product> products = model.getProducts()
+                .stream()
+                .filter(product -> !product.getSellerId().equals(userId))
+                .toList();
+        for (var product : products) {
+            System.out.println("    " + index + ". " + product.show());
+            index++;
+        }
+        System.out.println("    0. Exit");
+        System.out.print("    Answer: ");
+        int productOption = sc.nextInt();
+        sc.nextLine();
+        if (productOption == EXIT) {
+            return;
+        }
+        model.addProductToUserCart(userId, products.get(productOption - 1).getId());
+    }
+
+    private void shippingCompanyMenu() {
+        System.out.println("\nShipping Company Menu - " + now());
+        System.out.println("  1. Deliver Order");
+        System.out.println("  0. Logout");
+        System.out.print("  Answer: ");
+
+        int option = sc.nextInt();
+        sc.nextLine();
+
+        switch (option) {
+            case DELIVER -> {
+                deliverOrder();
+            }
+            case EXIT -> {
+                exit();
+            }
+        }
+
+        shippingCompanyMenu();
+    }
+
+    public void deliverOrder() {
+        System.out.println("  Choose an order:");
+        int index = 1;
+        List<Order> undeliveredOrders = model.getShippingCompanyUndeliveredOrders(shippingCompanyId);
+        for (var order : undeliveredOrders) {
+            User buyer = model.getUser(order.getBuyerId()).orElseThrow();
+            System.out.println("    " + index + ". Size: " + order.getSize() + ", Recipient: " + buyer.getName() + ", Address: " + buyer.getAddress());
+            index++;
+        }
+        System.out.println("    0. Exit");
+        System.out.print("    Answer: ");
+        int deliverOption = sc.nextInt();
+        sc.nextLine();
+        if (deliverOption == EXIT) {
+            return;
+        }
+        model.deliverOrder(undeliveredOrders.get(deliverOption - 1).getId());
+        System.out.println("  Order delivered.");
+    }
+
     private Product newProduct() {
-        System.out.println("\nNew Product");
+        System.out.println("\nNew Product - " + now());
 
         System.out.println("  Choose a type of product:");
-        System.out.println("  1. Sneaker");
-        System.out.println("  2. T-Shirt");
-        System.out.println("  3. Handbag");
-        System.out.print("  Answer: ");
+        System.out.println("    1. Sneaker");
+        System.out.println("    2. T-Shirt");
+        System.out.println("    3. Handbag");
+        System.out.print("    Answer: ");
 
         int productTypeOption = sc.nextInt();
         sc.nextLine();
@@ -294,12 +342,12 @@ public class Controller {
         sc.nextLine();
 
         System.out.println("  State of the product:");
-        System.out.println("  1. New with tag");
-        System.out.println("  2. New without tag");
-        System.out.println("  3. Very good");
-        System.out.println("  4. Good");
-        System.out.println("  5. Satisfactory");
-        System.out.print("  Answer: ");
+        System.out.println("    1. New with tag");
+        System.out.println("    2. New without tag");
+        System.out.println("    3. Very good");
+        System.out.println("    4. Good");
+        System.out.println("    5. Satisfactory");
+        System.out.print("    Answer: ");
 
         int productStateOption = sc.nextInt();
         sc.nextLine();
@@ -317,7 +365,7 @@ public class Controller {
         int index = 1;
         List<ShippingCompany> shippingCompanies = model.getShippingCompanies();
         for (var shippingCompany : shippingCompanies) {
-            System.out.println("  " + index + ". " + shippingCompany.getName() + (shippingCompany instanceof Premium ? " P" : ""));
+            System.out.println("    " + index + ". " + shippingCompany.getName() + (shippingCompany instanceof Premium ? " P" : ""));
             index++;
         }
         System.out.print("  Answer: ");
@@ -360,10 +408,10 @@ public class Controller {
                     default -> Size.M;
                 };
                 System.out.println("  Pattern:");
-                System.out.println("  1. Plain");
-                System.out.println("  2. Stripes");
-                System.out.println("  3. Palm trees");
-                System.out.print("  Answer: ");
+                System.out.println("    1. Plain");
+                System.out.println("    2. Stripes");
+                System.out.println("    3. Palm trees");
+                System.out.print("    Answer: ");
                 int patternOption = sc.nextInt();
                 sc.nextLine();
                 TShirt.Pattern pattern = switch (patternOption) {
@@ -378,18 +426,18 @@ public class Controller {
                 System.out.print("  Dimension in litters: ");
                 BigDecimal dimension = new BigDecimal(sc.nextLine());
                 System.out.print("  Material: ");
-                System.out.println("  1.  Canvas");
-                System.out.println("  2.  Cotton");
-                System.out.println("  3.  Denim");
-                System.out.println("  4.  Fabric");
-                System.out.println("  5.  Leather");
-                System.out.println("  6.  Nylon");
-                System.out.println("  7.  Raffia");
-                System.out.println("  8.  Straw");
-                System.out.println("  9.  Vegan leather");
-                System.out.println("  10. Velvet");
-                System.out.println("  11. Vinyl");
-                System.out.print("  Answer: ");
+                System.out.println("    1.  Canvas");
+                System.out.println("    2.  Cotton");
+                System.out.println("    3.  Denim");
+                System.out.println("    4.  Fabric");
+                System.out.println("    5.  Leather");
+                System.out.println("    6.  Nylon");
+                System.out.println("    7.  Raffia");
+                System.out.println("    8.  Straw");
+                System.out.println("    9.  Vegan leather");
+                System.out.println("    10. Velvet");
+                System.out.println("    11. Vinyl");
+                System.out.print("    Answer: ");
 
                 int materialOption = sc.nextInt();
                 sc.nextLine();
@@ -427,5 +475,11 @@ public class Controller {
                 return null;
             }
         }
+    }
+
+    private String now() {
+        return LocalDateTime.now(TimeSimulation.getClock())
+                .atOffset(ZoneOffset.UTC)
+                .format(DateTimeFormatter.RFC_1123_DATE_TIME);
     }
 }

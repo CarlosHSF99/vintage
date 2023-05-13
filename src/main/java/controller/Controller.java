@@ -86,18 +86,18 @@ public class Controller {
                 System.out.println("\nLoad System State - " + now());
                 System.out.print("  Path: ");
                 String path = sc.nextLine();
-                Vintage tmp = null;
+                ClockVintagePair systemState = null;
                 try {
                     FileInputStream fileIn = new FileInputStream(path);
                     ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-                    tmp = (Vintage) objectIn.readObject();
+                    systemState = (ClockVintagePair) objectIn.readObject();
                     objectIn.close();
                     fileIn.close();
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println("  Error loading system from file.");
                 }
-                this.model = tmp;
-                TimeSimulation.loadTimeSimulationMemento(this.model.getTimeSimulationMemento());
+                this.model = systemState.vintage;
+                TimeSimulation.loadTimeSimulationMemento(systemState.clock);
                 System.out.println("  System loaded from " + path);
             }
             case EXIT -> {
@@ -162,14 +162,14 @@ public class Controller {
     }
 
     private void saveSystemState() {
-        model.saveTimeSimulationMemento(TimeSimulation.getClock());
+        ClockVintagePair systemState = new ClockVintagePair(TimeSimulation.getClock(), model);
         System.out.println("\nSave System State - " + now());
         System.out.print("  Path: ");
         String path = sc.nextLine();
         try {
             FileOutputStream fileOut = new FileOutputStream(path);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-            objectOut.writeObject(model);
+            objectOut.writeObject(systemState);
             objectOut.close();
             fileOut.close();
         } catch (IOException e) {
@@ -482,4 +482,6 @@ public class Controller {
                 .atOffset(ZoneOffset.UTC)
                 .format(DateTimeFormatter.RFC_1123_DATE_TIME);
     }
+
+    record ClockVintagePair(Clock clock, Vintage vintage) implements Serializable {}
 }

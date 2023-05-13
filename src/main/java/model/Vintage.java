@@ -5,7 +5,6 @@ import exceptions.ProductInCartUnavailable;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,6 @@ public class Vintage implements Serializable {
     private final Map<String, Order> orders;
     private final Map<String, ShippingCompany> shippingCompanies;
     private BigDecimal revenue;
-    private Clock clockMemento;
 
     public Vintage(BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal orderFee) {
         this.baseValueSmall = baseValueSmall;
@@ -181,13 +179,5 @@ public class Vintage implements Serializable {
 
     public BigDecimal getRevenue() {
         return revenue;
-    }
-
-    public void saveTimeSimulationMemento(Clock clockMemento) {
-        this.clockMemento = clockMemento;
-    }
-
-    public Clock getTimeSimulationMemento() {
-        return clockMemento;
     }
 }

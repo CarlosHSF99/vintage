@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ShippingCompany {
+public class ShippingCompany implements Serializable {
     private static long numberOfProducts = 0;
 
     private final String id;

@@ -1,10 +1,11 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Year;
 
-public class Handbag extends Product {
+public class Handbag extends Product implements Serializable {
     private final BigDecimal dimension;
     private final Material material;
     private final Year collectionYear;

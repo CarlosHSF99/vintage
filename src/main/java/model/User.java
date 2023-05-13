@@ -1,12 +1,13 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class User {
+public class User implements Serializable {
     private static long numberOfUsers = 0;
 
     private final String id;

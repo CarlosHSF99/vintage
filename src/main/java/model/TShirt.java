@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * TShirt class
  */
-public class TShirt extends Product {
+public class TShirt extends Product implements Serializable {
     private final Size size;
     private final Pattern pattern;
 

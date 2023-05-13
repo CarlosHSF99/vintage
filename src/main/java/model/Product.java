@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Abstract product class.
  */
-public abstract class Product {
+public abstract class Product implements Serializable {
     private static long numberOfProducts = 0;
 
     private final String id;

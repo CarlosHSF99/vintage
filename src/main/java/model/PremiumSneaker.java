@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.time.temporal.ChronoUnit;
@@ -8,7 +9,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * Premium Sneaker class
  */
-public class PremiumSneaker extends Sneaker implements Premium {
+public class PremiumSneaker extends Sneaker implements Premium, Serializable {
     /**
      * Parameterized constructor.
      *
@@ -47,7 +48,7 @@ public class PremiumSneaker extends Sneaker implements Premium {
     @Override
     public BigDecimal priceCorrection() {
         return BigDecimal.ONE.add(getSellerPriceCorrection())
-                .pow((int) getCollectionYear().until(Year.now(), ChronoUnit.YEARS));
+                .pow((int) getCollectionYear().until(Year.now(TimeSimulation.getClock()), ChronoUnit.YEARS));
     }
 
     @Override

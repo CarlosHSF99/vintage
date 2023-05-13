@@ -1,18 +1,19 @@
 package model;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Year;
 
 /**
  * Sneaker class
  */
-public class Sneaker extends Product {
-    private int size;
-    private Color color;
-    private boolean laces;
-    private Year collectionYear;
-    private BigDecimal sellerPriceCorrection;
+public class Sneaker extends Product implements Serializable {
+    private final int size;
+    private final Color color;
+    private final boolean laces;
+    private final Year collectionYear;
+    private final BigDecimal sellerPriceCorrection;
 
     /**
      * Parameterized constructor

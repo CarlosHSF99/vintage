@@ -2,12 +2,13 @@ package model;
 
 import exceptions.ProductInCartUnavailable;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Vintage {
+public class Vintage implements Serializable {
     private final BigDecimal baseValueSmall;
     private final BigDecimal baseValueMedium;
     private final BigDecimal baseValueBig;

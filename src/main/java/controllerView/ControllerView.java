@@ -1,4 +1,4 @@
-package controller;
+package controllerView;
 
 import model.*;
 
@@ -11,7 +11,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Scanner;
 
-public class Controller {
+public class ControllerView {
     private static final int EXIT = 0;
 
     private static final int NEW_SYSTEM = 1;
@@ -42,6 +42,7 @@ public class Controller {
 
     private static final int EXPEDITE = 1;
     private static final int DELIVER = 2;
+    private static final int PROFIT_MARGIN = 3;
 
     private static final int SNEAKER = 1;
     private static final int T_SHIRT = 2;
@@ -68,7 +69,7 @@ public class Controller {
     private String userId;
     private String shippingCompanyId;
 
-    public Controller() {
+    public ControllerView() {
         this.sc = new Scanner(System.in);
         this.userId = null;
 
@@ -114,7 +115,8 @@ public class Controller {
             }
             case EXIT -> {
                 this.model = null;
-                exit();
+                System.out.println("Exiting...");
+                System.exit(0);
             }
             default -> {
                 this.model = null;
@@ -414,6 +416,7 @@ public class Controller {
         System.out.println("\nShipping Company Menu - " + now());
         System.out.println("  1. Expedite order");
         System.out.println("  2. Deliver order");
+        System.out.println("  3. Change profit margin");
         System.out.println("  0. Logout");
         System.out.print("  Answer: ");
 
@@ -423,6 +426,7 @@ public class Controller {
         switch (option) {
             case EXPEDITE -> expedite();
             case DELIVER -> deliverOrder();
+            case PROFIT_MARGIN -> changeProfitMargin();
             case EXIT -> {
                 return;
             }
@@ -431,6 +435,12 @@ public class Controller {
         }
 
         shippingCompanyMenu();
+    }
+
+    private void changeProfitMargin() {
+        System.out.print("  New profit margin: ");
+        model.setShippingCompanyProfitMargin(shippingCompanyId, new BigDecimal(sc.nextLine()));
+        System.out.println("  Profit margin updated.");
     }
 
     private void expedite() {

@@ -1,0 +1,366 @@
+@startuml
+interface Premium {
+}
+
+class User {
+- {static} long numberOfUsers
+- String id
+- String taxNumber
+- String name
+- Map<String,Product> products
+- Map<String,Order> ordersMade
+- Map<String,Order> ordersReceived
+- Map<String,Product> cart
+- String email
+- String address
+- BigDecimal revenue
+- BigDecimal spending
++ <<Create>> User(String,String,String,String)
+- <<Create>> User(User)
++ String getId()
++ String getTaxNumber()
++ String getEmail()
++ void setEmail(String)
++ String getName()
++ String getAddress()
++ void setAddress(String)
++ void addProductToCart(Product)
++ void removeProductFromCart(String)
++ void removeProductFromCart(Product)
++ void clearCart()
++ List<Product> getCart()
++ List<Product> returnCart()
++ void addProductSelling(Product)
++ void addProductsSelling(List<Product>)
++ void addOrderMade(Order)
++ void addOrdersMade(List<Order>)
++ void addOrderReceived(Order)
++ void addOrdersReceived(List<Order>)
++ List<Product> getProducts()
++ List<Product> getProductsSold()
++ List<Product> getProductsBought()
++ List<Order> getOrdersMade()
++ List<Order> getOrdersReceived()
++ void removeProductSelling(String)
+- void addProduct(Map<String,Product>,Product)
+- void addProducts(Map<String,Product>,List<Product>)
+- List<Product> getProducts(Map<String,Product>)
++ BigDecimal getRevenue()
++ BigDecimal getRevenue(LocalDateTime,LocalDateTime)
++ BigDecimal getSpending()
++ BigDecimal getSpending(LocalDateTime,LocalDateTime)
++ void orderMadeReturned(String)
++ void orderReceivedReturned(String)
++ List<Order> getReturnableOrders()
+- String nextAlphanumericId()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
++ User clone()
+}
+
+class PremiumSneaker {
++ <<Create>> PremiumSneaker(String,String,String,String,
+BigDecimal,int,State,int,Color,boolean,Year,BigDecimal)
++ BigDecimal priceCorrection()
+}
+
+class Vintage {
+- BigDecimal baseValueSmall
+- BigDecimal baseValueMedium
+- BigDecimal baseValueBig
+- BigDecimal orderFee
+- Map<String,Product> products
+- Map<String,User> users
+- Map<String,Order> orders
+- Map<String,ShippingCompany> shippingCompanies
+- BigDecimal revenue
++ <<Create>> Vintage(BigDecimal,BigDecimal,BigDecimal,BigDecimal)
++ <<Create>> Vintage(String,String,String,String)
++ void registerUser(String,String,String,String)
++ void registerShippingCompany(String,BigDecimal)
++ void registerPremiumShippingCompany(String,BigDecimal,BigDecimal)
++ void publishProduct(String,Product)
++ void addProductToUserCart(String,String)
++ void removeProductFromUserCart(String,String)
++ List<Product> getProducts()
++ List<ShippingCompany> getShippingCompanies()
++ Optional<String> getUserIdByEmail(String)
++ Optional<User> getUser(String)
++ Optional<String> getShippingCompanyIdByName(String)
++ List<Order> getShippingCompanyInitializedOrders(String)
++ List<Order> getShippingCompanyExpeditedOrders(String)
++ void setShippingCompanyProfitMargin(String,BigDecimal)
++ List<Order> getUserReturnableOrders(String)
++ void deliverOrder(String)
++ void expediteOrder(String)
++ void orderUserCart(String)
++ void returnOrder(String)
++ Optional<User> userWithMostRevenue()
++ Optional<User> userWithMostRevenue(LocalDateTime,LocalDateTime)
++ Optional<ShippingCompany> shippingCompanyMostRevenue()
++ List<Order> userIssuedOrders(String)
++ List<User> topSellersInInterval(LocalDateTime,LocalDateTime)
++ List<User> topBuyersInInterval(LocalDateTime,LocalDateTime)
++ BigDecimal getRevenue()
+}
+
+enum Size {
++  S
++  M
++  L
++  XL
+}
+
+class Order {
+- {static} BigDecimal NEW_FEE
+- {static} BigDecimal USED_FEE
+- {static} long numberOfProducts
+- String id
+- String buyerId
+- String sellerId
+- String shippingCompanyId
+- Map<String,Product> products
+- LocalDateTime creationDate
+- BigDecimal productsCost
+- BigDecimal shippingCost
+- BigDecimal vintageFees
+- BigDecimal totalCost
+- LocalDateTime deliveryDateTime
+- Status status
++ <<Create>> Order(Collection<Product>,
+String,String,String,BigDecimal)
+- <<Create>> Order(Order)
++ String getId()
++ List<Product> getProducts()
++ LocalDateTime getCreationDate()
++ LocalDateTime getDeliveryDateTime()
++ String getSellerId()
++ String getBuyerId()
++ Status getStatus()
++ String getShippingCompanyId()
++ String getSize()
++ void expedite()
++ void deliver()
++ void setAsReturned()
++ boolean isInitialized()
++ boolean isExpedited()
++ boolean isDelivered()
++ boolean isReturned()
++ boolean isReturnable()
++ BigDecimal totalCost()
++ BigDecimal productsCost()
++ BigDecimal shippingCost()
++ BigDecimal vintageFees()
++ BigDecimal sellerRevenue()
+- String nextAlphanumericId()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
++ Order clone()
+}
+
+enum Status {
++  INITIALIZED
++  EXPEDITED
++  DELIVERED
++  RETURNED
+}
+
+class TShirt {
+- Size size
+- Pattern pattern
++ <<Create>> TShirt(String,String,String,
+String,BigDecimal,int,State,Size,Pattern)
++ Size getSize()
++ Pattern getPattern()
++ BigDecimal priceCorrection()
++ String show()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+
+enum Pattern {
++  PLAIN
++  STRIPES
++  PALM_TREES
+- BigDecimal value
+~ <<Create>> Pattern(String)
++ BigDecimal getValue()
+}
+
+class ShippingCompany {
+- {static} long numberOfProducts
+- String id
+- String name
+- Map<String,Order> orders
+- BigDecimal baseValueSmall
+- BigDecimal baseValueMedium
+- BigDecimal baseValueBig
+- BigDecimal fee
+- BigDecimal revenue
+- BigDecimal profitMargin
++ <<Create>> ShippingCompany(String,BigDecimal,
+BigDecimal,BigDecimal,BigDecimal,BigDecimal)
+# <<Create>> ShippingCompany(ShippingCompany)
++ String getId()
++ String getName()
++ BigDecimal getProfitMargin()
++ void setProfitMargin(BigDecimal)
++ void addOrder(Order)
++ List<Order> getOrders()
++ List<Order> getExpeditedOrders()
++ List<Order> getInitializedOrders()
++ BigDecimal getRevenue()
++ BigDecimal shippingCost(long)
++ BigDecimal shippingCost(Order)
+- String nextAlphanumericId()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
++ ShippingCompany clone()
+}
+
+class PremiumHandbag {
+- BigDecimal appreciationRate
++ <<Create>> PremiumHandbag(String,String,String,String,
+BigDecimal,int,State,BigDecimal,Material,Year,BigDecimal)
++ BigDecimal getAppreciationRate()
++ BigDecimal priceCorrection()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+
+class PremiumShippingCompany {
+- BigDecimal premiumTax
++ <<Create>> PremiumShippingCompany(String,BigDecimal,
+BigDecimal,BigDecimal,BigDecimal,BigDecimal,BigDecimal)
++ <<Create>> PremiumShippingCompany(PremiumShippingCompany)
++ BigDecimal getPremiumTax()
++ void setPremiumTax(BigDecimal)
++ BigDecimal shippingCost(Order)
++ String toString()
++ boolean equals(Object)
++ int hashCode()
++ PremiumShippingCompany clone()
+}
+
+class Handbag {
+- BigDecimal dimension
+- Material material
+- Year collectionYear
++ <<Create>> Handbag(String,String,String,String,
+BigDecimal,int,State,BigDecimal,Material,Year)
++ BigDecimal getDimension()
++ Material getMaterial()
++ Year getCollectionYear()
++ BigDecimal priceCorrection()
++ String show()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+
+enum Material {
++  CANVAS
++  COTTON
++  DENIM
++  FABRIC
++  LEATHER
++  NYLON
++  RAFFIA
++  STRAW
++  VEGAN_LEATHER
++  VELVET
++  VINYL
+}
+
+class Sneaker {
+- int size
+- Color color
+- boolean laces
+- Year collectionYear
+- BigDecimal sellerPriceCorrection
++ <<Create>> Sneaker(String,String,String,String,
+BigDecimal,int,State,int,Color,boolean,Year,BigDecimal)
++ int getSize()
++ Color getColor()
++ boolean hasLaces()
++ Year getCollectionYear()
++ BigDecimal getSellerPriceCorrection()
++ BigDecimal priceCorrection()
++ String show()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+
+abstract class Product {
+- {static} long numberOfProducts
+- String id
+- String sellerId
+- String shippingCompanyId
+- String description
+- String brand
+- BigDecimal basePrice
+- int numberOfPreviousOwners
+- State state
++ <<Create>> Product(String,String,String,
+String,BigDecimal,int,State)
++ String getId()
++ String getSellerId()
++ String getShippingCompanyId()
++ String getDescription()
++ String getBrand()
++ BigDecimal getBasePrice()
++ int getNumberOfPreviousOwners()
++ State getState()
++ boolean isNew()
++ boolean isUsed()
++ {abstract}BigDecimal priceCorrection()
++ BigDecimal price()
+- String nextAlphanumericId()
++ String show()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+
+enum State {
++  NEW_WITH_TAG
++  NEW_WITHOUT_TAG
++  VERY_GOOD
++  GOOD
++  SATISFACTORY
+- BigDecimal priceCorrection
+~ <<Create>> State(String)
++ BigDecimal getPriceCorrection()
+}
+
+
+Sneaker <|-- PremiumSneaker
+Product <|-- TShirt
+Handbag <|-- PremiumHandbag
+Premium <|.. PremiumShippingCompany
+ShippingCompany <|-- PremiumShippingCompany
+Product <|-- Handbag
+Product <|-- Sneaker
+
+Vintage *--- "0..*" User : - users
+Vintage *---- "0..*" Product : - products
+Vintage o---- "0..*" Order : - orders
+Vintage *-left- "0..*" ShippingCompany
+
+User *-- "0..*" Product : - products
+User o-- "0..*" Order : - made
+User o-- "0..*" Order : - received
+
+Order *-left- "1..*" Product : - products
+
+PremiumSneaker .down.|> Premium
+
+PremiumHandbag .down.|> Premium
+
+@enduml

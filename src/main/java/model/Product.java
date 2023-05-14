@@ -40,22 +40,6 @@ public abstract class Product implements Serializable {
         this.state = state;
     }
 
-    /**
-     * Copy constructor.
-     *
-     * @param other Other Product
-     */
-    public Product(Product other) {
-        this.id = nextAlphanumericId();
-        this.sellerId = other.sellerId;
-        this.shippingCompanyId = other.shippingCompanyId;
-        this.description = other.description;
-        this.brand = other.brand;
-        this.basePrice = other.basePrice;
-        this.numberOfPreviousOwners = other.numberOfPreviousOwners;
-        this.state = other.state;
-    }
-
     public String getId() {
         return id;
     }
@@ -123,10 +107,12 @@ public abstract class Product implements Serializable {
         return basePrice.multiply(priceCorrection());
     }
 
-    public abstract String show();
-
     private String nextAlphanumericId() {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
+    }
+
+    public String show() {
+        return state + ", Price: " + price() + ", " + brand + ", " + description + ", nº prev. owners: " + numberOfPreviousOwners;
     }
 
     @Override
@@ -172,9 +158,6 @@ public abstract class Product implements Serializable {
         result = 31 * result + state.hashCode();
         return result;
     }
-
-    @Override
-    public abstract Product clone();
 
     /**
      * State enum

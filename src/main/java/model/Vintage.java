@@ -59,22 +59,27 @@ public class Vintage implements Serializable {
     }
 
     public void publishProduct(String userId, Product product) {
-        Product productCopy = product.clone();
-        products.put(product.getId(), productCopy);
+        products.put(product.getId(), product);
         users.computeIfPresent(userId, (k, v) -> {
-            v.addProductSelling(productCopy);
+            v.addProductSelling(product);
             return v;
         });
     }
 
-    public void addProductToUserCart(String productCode, String userCode) {
-        if (products.containsKey(productCode) || users.containsKey(userCode)) {
-            users.get(userCode).addProductToCart(products.get(productCode));
+    public void addProductToUserCart(String userId, String productId) {
+        if (users.containsKey(userId) && products.containsKey(productId)) {
+            users.get(userId).addProductToCart(products.get(productId));
+        }
+    }
+
+    public void removeProductFromUserCart(String userId, String productId) {
+        if (users.containsKey(userId) && products.containsKey(productId)) {
+            users.get(userId).removeProductFromCart(products.get(productId));
         }
     }
 
     public List<Product> getProducts() {
-        return products.values().stream().map(Product::clone).toList();
+        return products.values().stream().toList();
     }
 
     public List<ShippingCompany> getShippingCompanies() {
@@ -97,12 +102,24 @@ public class Vintage implements Serializable {
                 .map(ShippingCompany::getId);
     }
 
-    public List<Order> getShippingCompanyUndeliveredOrders(String shippingCompanyId) {
-        return shippingCompanies.get(shippingCompanyId).getUndeliveredOrders();
+    public List<Order> getShippingCompanyInitializedOrders(String shippingCompanyId) {
+        return shippingCompanies.get(shippingCompanyId).getInitializedOrders();
+    }
+
+    public List<Order> getShippingCompanyExpeditedOrders(String shippingCompanyId) {
+        return shippingCompanies.get(shippingCompanyId).getExpeditedOrders();
+    }
+
+    public List<Order> getUserReturnableOrders(String userId) {
+        return users.get(userId).getReturnableOrders();
     }
 
     public void deliverOrder(String orderId) {
         orders.get(orderId).deliver();
+    }
+
+    public void expediteOrder(String orderId) {
+        orders.get(orderId).expedite();
     }
 
     public void orderUserCart(String buyerId) throws ProductInCartUnavailable {
@@ -129,7 +146,6 @@ public class Vintage implements Serializable {
 
         // generate and distribute orders
         cart.stream()
-                .map(Product::clone)
                 .collect(Collectors.groupingBy(p -> new SellerShippingCompanyPair(p.getSellerId(), p.getShippingCompanyId())))
                 .entrySet()
                 .stream()
@@ -169,11 +185,11 @@ public class Vintage implements Serializable {
         return users.get(userId).getOrdersMade().stream().map(Order::clone).toList();
     }
 
-    public List<User> topSellerInInterval(LocalDateTime from, LocalDateTime to) {
+    public List<User> topSellersInInterval(LocalDateTime from, LocalDateTime to) {
         return users.values().stream().sorted(Comparator.comparing(user -> user.getRevenue(from, to))).toList();
     }
 
-    public List<User> topBuyerInInterval(LocalDateTime from, LocalDateTime to) {
+    public List<User> topBuyersInInterval(LocalDateTime from, LocalDateTime to) {
         return users.values().stream().sorted(Comparator.comparing(user -> user.getSpending(from, to))).toList();
     }
 

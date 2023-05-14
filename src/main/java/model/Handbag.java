@@ -17,13 +17,6 @@ public class Handbag extends Product implements Serializable {
         this.collectionYear = collectionYear;
     }
 
-    public Handbag(Handbag other) {
-        super(other);
-        this.dimension = other.dimension;
-        this.material = other.material;
-        this.collectionYear = other.collectionYear;
-    }
-
     public BigDecimal getDimension() {
         return dimension;
     }
@@ -46,7 +39,7 @@ public class Handbag extends Product implements Serializable {
 
     @Override
     public String show() {
-        return null;
+        return "Handbag, " + super.show() + ", Dimension: " + dimension + "L, Material: " + material + "Collection year: " + collectionYear;
     }
 
     @Override
@@ -79,11 +72,6 @@ public class Handbag extends Product implements Serializable {
         result = 31 * result + material.hashCode();
         result = 31 * result + collectionYear.hashCode();
         return result;
-    }
-
-    @Override
-    public Handbag clone() {
-        return new Handbag(this);
     }
 
     public enum Material {

@@ -40,20 +40,6 @@ public class Sneaker extends Product implements Serializable {
         this.sellerPriceCorrection = discount;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param other Other Sneaker
-     */
-    public Sneaker(Sneaker other) {
-        super(other);
-        this.size = other.size;
-        this.color = other.color;
-        this.laces = other.laces;
-        this.collectionYear = other.collectionYear;
-        this.sellerPriceCorrection = other.sellerPriceCorrection;
-    }
-
     public int getSize() {
         return size;
     }
@@ -86,7 +72,7 @@ public class Sneaker extends Product implements Serializable {
 
     @Override
     public String show() {
-        return null;
+        return "Sneaker, " + super.show() + ", Size: " + size + ", Color: " + String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue()) + ", " + (laces ? "has" : "no") + " laces, Collection year: " + collectionYear;
     }
 
     @Override
@@ -125,10 +111,5 @@ public class Sneaker extends Product implements Serializable {
         result = 31 * result + collectionYear.hashCode();
         result = 31 * result + sellerPriceCorrection.hashCode();
         return result;
-    }
-
-    @Override
-    public Sneaker clone() {
-        return new Sneaker(this);
     }
 }

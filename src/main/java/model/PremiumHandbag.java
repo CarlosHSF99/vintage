@@ -13,11 +13,6 @@ public class PremiumHandbag extends Handbag implements Premium, Serializable {
         this.appreciationRate = appreciationRate;
     }
 
-    public PremiumHandbag(PremiumHandbag other) {
-        super(other);
-        this.appreciationRate = other.appreciationRate;
-    }
-
     public BigDecimal getAppreciationRate() {
         return appreciationRate;
     }
@@ -26,11 +21,6 @@ public class PremiumHandbag extends Handbag implements Premium, Serializable {
     public BigDecimal priceCorrection() {
         return super.priceCorrection()
                 .multiply(appreciationRate.pow((int) getCollectionYear().until(Year.now(TimeSimulation.getClock()), ChronoUnit.YEARS)));
-    }
-
-    @Override
-    public String show() {
-        return null;
     }
 
     @Override
@@ -54,9 +44,5 @@ public class PremiumHandbag extends Handbag implements Premium, Serializable {
         int result = super.hashCode();
         result = 31 * result + appreciationRate.hashCode();
         return result;
-    }
-
-    public PremiumHandbag clone() {
-        return new PremiumHandbag(this);
     }
 }

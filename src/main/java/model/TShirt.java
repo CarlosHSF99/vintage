@@ -29,17 +29,6 @@ public class TShirt extends Product implements Serializable {
         this.pattern = pattern;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param other Other TShirt
-     */
-    public TShirt(TShirt other) {
-        super(other);
-        this.size = other.size;
-        this.pattern = other.pattern;
-    }
-
     public Size getSize() {
         return size;
     }
@@ -59,7 +48,7 @@ public class TShirt extends Product implements Serializable {
 
     @Override
     public String show() {
-        return "T-Shirt | " + getBrand() + " | " + getState() + " | " + getDescription() + " | " + getPattern() + " | Price: " + price() + " | nº prev. owners: " + getNumberOfPreviousOwners();
+        return "T-Shirt, " + super.show() + ", " + getPattern();
     }
 
     @Override
@@ -89,11 +78,6 @@ public class TShirt extends Product implements Serializable {
         result = 31 * result + size.hashCode();
         result = 31 * result + pattern.hashCode();
         return result;
-    }
-
-    @Override
-    public TShirt clone() {
-        return new TShirt(this);
     }
 
     public enum Pattern {

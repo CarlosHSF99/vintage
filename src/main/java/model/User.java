@@ -45,9 +45,7 @@ public class User implements Serializable {
         this.products = new HashMap<>(other.products);
         this.ordersMade = new HashMap<>(other.ordersMade);
         this.ordersReceived = new HashMap<>(other.ordersReceived);
-        this.cart = other.cart.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        this.cart = new HashMap<>(other.cart);
         this.revenue = other.revenue;
         this.spending = other.spending;
     }
@@ -81,7 +79,7 @@ public class User implements Serializable {
     }
 
     public void addProductToCart(Product product) {
-        cart.put(product.getId(), product.clone());
+        cart.put(product.getId(), product);
     }
 
     // add exception
@@ -99,11 +97,11 @@ public class User implements Serializable {
     }
 
     public List<Product> getCart() {
-        return cart.values().stream().map(Product::clone).toList();
+        return new ArrayList<>(cart.values());
     }
 
     public List<Product> returnCart() {
-        var products = cart.values().stream().map(Product::clone).toList();
+        var products = new ArrayList<>(cart.values());
         cart.clear();
         return products;
     }
@@ -168,12 +166,11 @@ public class User implements Serializable {
     }
 
     private List<Product> getProducts(Map<String, Product> products) {
-        return products.values().stream().map(Product::clone).collect(Collectors.toCollection(ArrayList::new));
+        return new ArrayList<>(products.values());
     }
 
     public BigDecimal getRevenue() {
         return revenue;
-        // return ordersReceived.values().stream().map(Order::sellerRevenue).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getRevenue(LocalDateTime from, LocalDateTime to) {
@@ -203,6 +200,10 @@ public class User implements Serializable {
 
     public void orderReceivedReturned(String orderId) {
         revenue = revenue.subtract(ordersReceived.get(orderId).productsCost());
+    }
+
+    public List<Order> getReturnableOrders() {
+        return ordersMade.values().stream().filter(Order::isReturnable).map(Order::clone).toList();
     }
 
     private String nextAlphanumericId() {

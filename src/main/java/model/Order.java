@@ -45,13 +45,11 @@ public class Order implements Serializable {
     }
 
     private Order(Order other) {
-        this.id = nextAlphanumericId();
+        this.id = other.id;
         this.buyerId = other.buyerId;
         this.sellerId = other.sellerId;
         this.shippingCompanyId = other.shippingCompanyId;
-        this.products = other.products.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        this.products = new HashMap<>(other.products);
         this.creationDate = other.creationDate;
         this.deliveryDateTime = other.deliveryDateTime;
         this.productsCost = other.productsCost;
@@ -89,16 +87,13 @@ public class Order implements Serializable {
         return status;
     }
 
-    public boolean wasReturned() {
-        return status == Status.RETURNED;
-    }
-
-    public boolean wasNotReturned() {
-        return status != Status.RETURNED;
-    }
-
     public String getShippingCompanyId() {
         return shippingCompanyId;
+    }
+
+    public String getSize() {
+        int numberOfProducts = products.size();
+        return numberOfProducts <= 5 ? numberOfProducts == 1 ? "small" : "medium" : "big";
     }
 
     public void expedite() throws StatusOrderException {
@@ -124,6 +119,27 @@ public class Order implements Serializable {
             throw new LateReturnException("Trying to return order past return deadline.");
         }
         status = Status.RETURNED;
+    }
+
+    public boolean isInitialized() {
+        return status == Status.INITIALIZED;
+    }
+
+    public boolean isExpedited() {
+        return status == Status.EXPEDITED;
+    }
+
+    public boolean isDelivered() {
+        return status == Status.DELIVERED;
+    }
+
+    public boolean isReturned() {
+        return status == Status.RETURNED;
+    }
+
+    public boolean isReturnable() {
+        var twoDaysMillis = 172800000;
+        return status == Status.DELIVERED && creationDate.until(deliveryDateTime, ChronoUnit.MILLIS) < twoDaysMillis;
     }
 
     public BigDecimal totalCost() {

@@ -2,9 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ShippingCompany implements Serializable {
     private static long numberOfProducts = 0;
@@ -62,6 +60,18 @@ public class ShippingCompany implements Serializable {
     public void addOrder(Order order) {
         orders.put(order.getId(), order);
         revenue = revenue.add(shippingCost(order));
+    }
+
+    public List<Order> getOrders() {
+        return orders.values().stream().map(Order::clone).toList();
+    }
+
+    public List<Order> getExpeditedOrders() {
+        return orders.values().stream().filter(Order::isExpedited).map(Order::clone).toList();
+    }
+
+    public List<Order> getInitializedOrders() {
+        return orders.values().stream().filter(Order::isInitialized).map(Order::clone).toList();
     }
 
     public BigDecimal getRevenue() {

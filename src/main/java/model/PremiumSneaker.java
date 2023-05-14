@@ -31,15 +31,6 @@ public class PremiumSneaker extends Sneaker implements Premium, Serializable {
     }
 
     /**
-     * Copy constructor.
-     *
-     * @param other PremiumSneaker
-     */
-    public PremiumSneaker(Sneaker other) {
-        super(other);
-    }
-
-    /**
      * Returns the price correction.
      * Price correction is calculated with the appreciation rate set by the seller.
      *
@@ -50,10 +41,4 @@ public class PremiumSneaker extends Sneaker implements Premium, Serializable {
         return BigDecimal.ONE.add(getSellerPriceCorrection())
                 .pow((int) getCollectionYear().until(Year.now(TimeSimulation.getClock()), ChronoUnit.YEARS));
     }
-
-    @Override
-    public String show() {
-        return null;
-    }
-
 }

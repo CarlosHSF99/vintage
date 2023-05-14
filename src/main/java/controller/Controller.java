@@ -5,9 +5,9 @@ import model.*;
 import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Scanner;
 
@@ -22,14 +22,26 @@ public class Controller {
     private static final int USER_LOGIN = 3;
     private static final int SHIPPING_COMPANY_LOGIN = 4;
     private static final int SAVE_SYSTEM = 5;
-    private static final int ADVANCE_TIME = 6;
+    private static final int STATISTICS = 6;
+    private static final int ADVANCE_TIME = 7;
+
+    private static final int ALL_TIME_BEST_SELLER = 1;
+    private static final int BEST_SELLER_IN_TIME_INTERVAL = 2;
+    private static final int BEST_SHIPPING_COMPANY = 3;
+    private static final int USER_ISSUED_ORDERS = 4;
+    private static final int USERS_BY_REVENUE = 5;
+    private static final int USERS_BY_SPENDING = 6;
+    private static final int VINTAGE_REVENUE = 7;
 
     private static final int PUBLISH_PRODUCT = 1;
     private static final int ADD_PRODUCT_TO_CART = 2;
-    private static final int ORDER_CART = 3;
-    private static final int RETURN_ORDER = 4;
+    private static final int REMOVE_PRODUCT_FROM_CART = 3;
+    private static final int ORDER_CART = 4;
+    private static final int RETURN_ORDER = 5;
+    private static final int SHOW_CART = 6;
 
-    private static final int DELIVER = 1;
+    private static final int EXPEDITE = 1;
+    private static final int DELIVER = 2;
 
     private static final int SNEAKER = 1;
     private static final int T_SHIRT = 2;
@@ -97,7 +109,7 @@ public class Controller {
                     System.out.println("  Error loading system from file.");
                 }
                 this.model = systemState.vintage;
-                TimeSimulation.loadTimeSimulationMemento(systemState.clock);
+                TimeSimulation.setClock(systemState.clock);
                 System.out.println("  System loaded from " + path);
             }
             case EXIT -> {
@@ -117,7 +129,8 @@ public class Controller {
         System.out.println("  3. User login");
         System.out.println("  4. Shipping company login");
         System.out.println("  5. Save system state");
-        System.out.println("  6. Advance time");
+        System.out.println("  6. Statistics");
+        System.out.println("  7. Advance time");
         System.out.println("  0. Exit");
         System.out.print("  Answer: ");
 
@@ -130,11 +143,84 @@ public class Controller {
             case USER_LOGIN -> userLogin();
             case SHIPPING_COMPANY_LOGIN -> shippingCompanyLogin();
             case SAVE_SYSTEM -> saveSystemState();
+            case STATISTICS -> statisticsMenu();
             case ADVANCE_TIME -> advanceTime();
             case EXIT -> exit();
+            default -> {
+            }
         }
 
         run();
+    }
+
+    private void statisticsMenu() {
+        System.out.println("\nExiting - " + now());
+        System.out.println("  1. All time seller with most revenue");
+        System.out.println("  2. Seller with most revenue in time interval");
+        System.out.println("  3. Shipping company with most revenue");
+        System.out.println("  4. Orders issued by user");
+        System.out.println("  5. List sorted users by revenue");
+        System.out.println("  6. List sorted users by spending");
+        System.out.println("  7. Vintage revenue");
+        System.out.println("  0. Back");
+        System.out.print("  Answer: ");
+
+        int option = sc.nextInt();
+        sc.nextLine();
+
+        switch (option) {
+            case ALL_TIME_BEST_SELLER -> {
+                System.out.print("  All time best seller: " + model.userWithMostRevenue().orElseThrow().getName());
+            }
+            case BEST_SELLER_IN_TIME_INTERVAL -> {
+                System.out.print("  From: ");
+                LocalDateTime from = LocalDateTime.parse(sc.nextLine());
+                System.out.print("  To: ");
+                LocalDateTime to = LocalDateTime.parse(sc.nextLine());
+                System.out.println("  Best seller between " + from.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)) + " and " + to.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)) + ": " + model.userWithMostRevenue(from, to));
+            }
+            case BEST_SHIPPING_COMPANY -> {
+                System.out.println("  Shipping company with most revenue: " + model.shippingCompanyMostRevenue());
+            }
+            case USER_ISSUED_ORDERS -> {
+                System.out.print("  User email: ");
+                String email = sc.nextLine();
+                List<Order> orders = model.getUser(model.getUserIdByEmail(email).orElseThrow()).orElseThrow().getOrdersReceived();
+                for (var order : orders) {
+                    System.out.println("  " + order);
+                }
+            }
+            case USERS_BY_REVENUE -> {
+                System.out.print("  From: ");
+                LocalDateTime from = LocalDateTime.parse(sc.nextLine());
+                System.out.print("  To: ");
+                LocalDateTime to = LocalDateTime.parse(sc.nextLine());
+                System.out.println("  Users by revenue between " + from.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)) + " and " + to.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)) + ":");
+                int index = 1;
+                for (var user : model.topSellersInInterval(from, to)) {
+                    System.out.println("  " + index + ". " + user.getName() + " - " + user.getRevenue() + " €");
+                    index++;
+                }
+            }
+            case USERS_BY_SPENDING -> {
+                System.out.print("  From: ");
+                LocalDateTime from = LocalDateTime.parse(sc.nextLine());
+                System.out.print("  To: ");
+                LocalDateTime to = LocalDateTime.parse(sc.nextLine());
+                System.out.println("  Users by spending between " + from.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)) + " and " + to.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)) + ":");
+                int index = 1;
+                for (var user : model.topBuyersInInterval(from, to)) {
+                    System.out.println("  " + index + ". " + user.getName() + " - " + user.getSpending() + " €");
+                    index++;
+                }
+
+            }
+            case VINTAGE_REVENUE -> {
+                System.out.println("  Vintage revenue: " + model.getRevenue());
+            }
+            default -> {
+            }
+        }
     }
 
     private void exit() {
@@ -200,15 +286,12 @@ public class Controller {
         BigDecimal profitMargin = new BigDecimal(sc.nextLine());
         System.out.print("  Is it a premium shipping company? [y/n] ");
         String premium = sc.nextLine();
-        switch (premium) {
-            case "y" -> {
-                System.out.print("    Premium Tax: ");
-                BigDecimal premiumTax = new BigDecimal(sc.nextLine());
-                model.registerPremiumShippingCompany(name, profitMargin, premiumTax);
-            }
-            case "n" -> {
-                model.registerShippingCompany(name, profitMargin);
-            }
+        if (premium.equals("y")) {
+            System.out.print("    Premium Tax: ");
+            BigDecimal premiumTax = new BigDecimal(sc.nextLine());
+            model.registerPremiumShippingCompany(name, profitMargin, premiumTax);
+        } else {
+            model.registerShippingCompany(name, profitMargin);
         }
         System.out.println("  Shipping company " + name + " registered.");
     }
@@ -231,8 +314,10 @@ public class Controller {
         System.out.println("\nUser Menu - " + now());
         System.out.println("  1. Publish product");
         System.out.println("  2. Add product to cart");
-        System.out.println("  3. Order cart");
-        System.out.println("  4. Return order");
+        System.out.println("  3. Remove product from cart");
+        System.out.println("  4. Order cart");
+        System.out.println("  5. Return order");
+        System.out.println("  6. Show cart");
         System.out.println("  0. Logout");
         System.out.print("  Answer: ");
 
@@ -242,15 +327,61 @@ public class Controller {
         switch (option) {
             case PUBLISH_PRODUCT -> publishProduct();
             case ADD_PRODUCT_TO_CART -> addProductToCart();
+            case REMOVE_PRODUCT_FROM_CART -> removeProductFromCart();
             case ORDER_CART -> model.orderUserCart(userId);
-            case RETURN_ORDER -> {
-            }
+            case RETURN_ORDER -> returnOrder();
+            case SHOW_CART -> showCart();
             case EXIT -> {
                 return;
+            }
+            default -> {
             }
         }
 
         userMenu();
+    }
+
+    private void removeProductFromCart() {
+        System.out.println("  Choose a product:");
+        int index = 1;
+        List<Product> cart = model.getUser(userId).orElseThrow().getCart();
+        for (var product : cart) {
+            System.out.println("    " + index + ". " + product.show());
+            index++;
+        }
+        System.out.println("    0. Exit");
+        System.out.print("    Answer: ");
+        int productOption = sc.nextInt();
+        sc.nextLine();
+        if (productOption == EXIT) {
+            return;
+        }
+        model.removeProductFromUserCart(userId, cart.get(productOption - 1).getId());
+    }
+
+    private void returnOrder() {
+        System.out.println("  Choose an order:");
+        int index = 1;
+        List<Order> returnableOrders = model.getUserReturnableOrders(userId);
+        for (var order : returnableOrders) {
+            User seller = model.getUser(order.getSellerId()).orElseThrow();
+            System.out.println("    " + index + ". Size: " + order.getSize() + ", Date: " + order.getCreationDate() + ", Seller: " + seller.getName() + ", Price: " + order.totalCost() + " €");
+            index++;
+        }
+        System.out.println("    0. Exit");
+        System.out.print("    Answer: ");
+        int returnOption = sc.nextInt();
+        sc.nextLine();
+        if (returnOption == EXIT) {
+            return;
+        }
+        model.returnOrder(returnableOrders.get(returnOption - 1).getId());
+        System.out.println("  Order expedited.");
+    }
+
+    private void showCart() {
+        System.out.println("  Cart:");
+        model.getUser(userId).orElseThrow().getCart().forEach(product -> System.out.println("    " + product.show()));
     }
 
     private void publishProduct() {
@@ -259,6 +390,7 @@ public class Controller {
     }
 
     private void addProductToCart() {
+        System.out.println("  Choose a product:");
         int index = 1;
         List<Product> products = model.getProducts()
                 .stream()
@@ -280,7 +412,8 @@ public class Controller {
 
     private void shippingCompanyMenu() {
         System.out.println("\nShipping Company Menu - " + now());
-        System.out.println("  1. Deliver Order");
+        System.out.println("  1. Expedite order");
+        System.out.println("  2. Deliver order");
         System.out.println("  0. Logout");
         System.out.print("  Answer: ");
 
@@ -288,22 +421,43 @@ public class Controller {
         sc.nextLine();
 
         switch (option) {
-            case DELIVER -> {
-                deliverOrder();
-            }
+            case EXPEDITE -> expedite();
+            case DELIVER -> deliverOrder();
             case EXIT -> {
-                exit();
+                return;
+            }
+            default -> {
             }
         }
 
         shippingCompanyMenu();
     }
 
+    private void expedite() {
+        System.out.println("  Choose an order:");
+        int index = 1;
+        List<Order> initializedOrders = model.getShippingCompanyInitializedOrders(shippingCompanyId);
+        for (var order : initializedOrders) {
+            User buyer = model.getUser(order.getBuyerId()).orElseThrow();
+            System.out.println("    " + index + ". Size: " + order.getSize() + ", Recipient: " + buyer.getName() + ", Address: " + buyer.getAddress());
+            index++;
+        }
+        System.out.println("    0. Exit");
+        System.out.print("    Answer: ");
+        int expediteOption = sc.nextInt();
+        sc.nextLine();
+        if (expediteOption == EXIT) {
+            return;
+        }
+        model.expediteOrder(initializedOrders.get(expediteOption - 1).getId());
+        System.out.println("  Order expedited.");
+    }
+
     public void deliverOrder() {
         System.out.println("  Choose an order:");
         int index = 1;
-        List<Order> undeliveredOrders = model.getShippingCompanyUndeliveredOrders(shippingCompanyId);
-        for (var order : undeliveredOrders) {
+        List<Order> expeditedOrders = model.getShippingCompanyExpeditedOrders(shippingCompanyId);
+        for (var order : expeditedOrders) {
             User buyer = model.getUser(order.getBuyerId()).orElseThrow();
             System.out.println("    " + index + ". Size: " + order.getSize() + ", Recipient: " + buyer.getName() + ", Address: " + buyer.getAddress());
             index++;
@@ -315,7 +469,7 @@ public class Controller {
         if (deliverOption == EXIT) {
             return;
         }
-        model.deliverOrder(undeliveredOrders.get(deliverOption - 1).getId());
+        model.deliverOrder(expeditedOrders.get(deliverOption - 1).getId());
         System.out.println("  Order delivered.");
     }
 
@@ -395,6 +549,7 @@ public class Controller {
                 } else {
                     System.out.print("  Discount: ");
                     BigDecimal discount = new BigDecimal(sc.nextLine());
+                    Sneaker foo = new Sneaker(userId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state, size, color, laces, collectionYear, discount);
                     return new Sneaker(userId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state, size, color, laces, collectionYear, discount);
                 }
             }
@@ -425,7 +580,7 @@ public class Controller {
             case HANDBAG -> {
                 System.out.print("  Dimension in litters: ");
                 BigDecimal dimension = new BigDecimal(sc.nextLine());
-                System.out.print("  Material: ");
+                System.out.println("  Material: ");
                 System.out.println("    1.  Canvas");
                 System.out.println("    2.  Cotton");
                 System.out.println("    3.  Denim");
@@ -472,7 +627,7 @@ public class Controller {
                 }
             }
             default -> {
-                return null;
+                return newProduct();
             }
         }
     }
@@ -483,5 +638,6 @@ public class Controller {
                 .format(DateTimeFormatter.RFC_1123_DATE_TIME);
     }
 
-    record ClockVintagePair(Clock clock, Vintage vintage) implements Serializable {}
+    record ClockVintagePair(Clock clock, Vintage vintage) implements Serializable {
+    }
 }

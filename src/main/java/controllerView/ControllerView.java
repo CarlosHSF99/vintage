@@ -1,6 +1,7 @@
 package controllerView;
 
 import model.*;
+import util.TimeSimulation;
 
 import java.awt.*;
 import java.io.*;

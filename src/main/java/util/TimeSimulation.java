@@ -1,4 +1,4 @@
-package model;
+package util;
 
 import java.time.Clock;
 import java.time.Duration;

@@ -1,5 +1,7 @@
 package model;
 
+import util.TimeSimulation;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Year;

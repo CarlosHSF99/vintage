@@ -1,20 +1,16 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.time.temporal.ChronoUnit;
 
-public class PremiumHandbag extends Handbag implements Premium {
+public class PremiumHandbag extends Handbag implements Premium, Serializable {
     private final BigDecimal appreciationRate;
 
-    public PremiumHandbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, double dimension, String material, Year collectionYear, BigDecimal appreciationRate) {
+    public PremiumHandbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, BigDecimal dimension, Material material, Year collectionYear, BigDecimal appreciationRate) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state, dimension, material, collectionYear);
         this.appreciationRate = appreciationRate;
-    }
-
-    public PremiumHandbag(PremiumHandbag other) {
-        super(other);
-        this.appreciationRate = other.appreciationRate;
     }
 
     public BigDecimal getAppreciationRate() {
@@ -24,7 +20,7 @@ public class PremiumHandbag extends Handbag implements Premium {
     @Override
     public BigDecimal priceCorrection() {
         return super.priceCorrection()
-                .multiply(appreciationRate.pow((int) getCollectionYear().until(Year.now(), ChronoUnit.YEARS)));
+                .multiply(appreciationRate.pow((int) getCollectionYear().until(Year.now(TimeSimulation.getClock()), ChronoUnit.YEARS)));
     }
 
     @Override
@@ -48,9 +44,5 @@ public class PremiumHandbag extends Handbag implements Premium {
         int result = super.hashCode();
         result = 31 * result + appreciationRate.hashCode();
         return result;
-    }
-
-    public PremiumHandbag clone() {
-        return new PremiumHandbag(this);
     }
 }

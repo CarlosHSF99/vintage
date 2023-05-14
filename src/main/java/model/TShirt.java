@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * TShirt class
  */
-public class TShirt extends Product {
+public class TShirt extends Product implements Serializable {
     private final Size size;
     private final Pattern pattern;
 
@@ -28,17 +29,6 @@ public class TShirt extends Product {
         this.pattern = pattern;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param other Other TShirt
-     */
-    public TShirt(TShirt other) {
-        super(other);
-        this.size = other.size;
-        this.pattern = other.pattern;
-    }
-
     public Size getSize() {
         return size;
     }
@@ -54,6 +44,11 @@ public class TShirt extends Product {
      */
     public BigDecimal priceCorrection() {
         return isUsed() ? pattern.getValue() : BigDecimal.ONE;
+    }
+
+    @Override
+    public String show() {
+        return "T-Shirt, " + super.show() + ", " + getPattern();
     }
 
     @Override
@@ -85,12 +80,7 @@ public class TShirt extends Product {
         return result;
     }
 
-    @Override
-    public TShirt clone() {
-        return new TShirt(this);
-    }
-
-    enum Pattern {
+    public enum Pattern {
         PLAIN("1.0"), STRIPES("0.5"), PALM_TREES("0.5");
 
         private final BigDecimal value;

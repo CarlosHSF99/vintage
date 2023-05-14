@@ -1,33 +1,27 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Year;
 
-public class Handbag extends Product {
-    private final double dimension;
-    private final String material;
+public class Handbag extends Product implements Serializable {
+    private final BigDecimal dimension;
+    private final Material material;
     private final Year collectionYear;
 
-    public Handbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, double dimension, String material, Year collectionYear) {
+    public Handbag(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, BigDecimal dimension, Material material, Year collectionYear) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
         this.dimension = dimension;
         this.material = material;
         this.collectionYear = collectionYear;
     }
 
-    public Handbag(Handbag other) {
-        super(other);
-        this.dimension = other.dimension;
-        this.material = other.material;
-        this.collectionYear = other.collectionYear;
-    }
-
-    public double getDimension() {
+    public BigDecimal getDimension() {
         return dimension;
     }
 
-    public String getMaterial() {
+    public Material getMaterial() {
         return material;
     }
 
@@ -37,10 +31,15 @@ public class Handbag extends Product {
 
     @Override
     public BigDecimal priceCorrection() {
-        var r = BigDecimal.ONE.subtract(BigDecimal.ONE.divide(new BigDecimal(dimension), 2, RoundingMode.HALF_EVEN));
+        var r = BigDecimal.ONE.subtract(BigDecimal.ONE.divide(dimension, 2, RoundingMode.HALF_EVEN));
         if (r.compareTo(BigDecimal.valueOf(0.5)) < 0)
             r = new BigDecimal("0.5");
         return r;
+    }
+
+    @Override
+    public String show() {
+        return "Handbag, " + super.show() + ", Dimension: " + dimension + "L, Material: " + material + "Collection year: " + collectionYear;
     }
 
     @Override
@@ -61,7 +60,7 @@ public class Handbag extends Product {
 
         Handbag handbag = (Handbag) o;
 
-        if (Double.compare(handbag.dimension, dimension) != 0) return false;
+        if (!dimension.equals(handbag.dimension)) return false;
         if (!material.equals(handbag.material)) return false;
         return collectionYear.equals(handbag.collectionYear);
     }
@@ -69,20 +68,13 @@ public class Handbag extends Product {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        long temp;
-        temp = Double.doubleToLongBits(dimension);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + dimension.hashCode();
         result = 31 * result + material.hashCode();
         result = 31 * result + collectionYear.hashCode();
         return result;
     }
 
-    @Override
-    public Handbag clone() {
-        return new Handbag(this);
-    }
-
-    enum Material {
+    public enum Material {
         CANVAS,
         COTTON,
         DENIM,

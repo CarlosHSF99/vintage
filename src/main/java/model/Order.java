@@ -3,6 +3,7 @@ package model;
 import exceptions.LateReturnException;
 import exceptions.StatusOrderException;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Order {
+public class Order implements Serializable {
     private static final BigDecimal NEW_FEE = new BigDecimal("0.5");
     private static final BigDecimal USED_FEE = new BigDecimal("0.25");
     private static long numberOfProducts = 0;
@@ -33,7 +34,7 @@ public class Order {
         this.sellerId = sellerId;
         this.shippingCompanyId = shippingCompanyId;
         this.products = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = LocalDateTime.now(TimeSimulation.getClock());
         this.productsCost = products.stream().map(Product::price).reduce(BigDecimal.ZERO, BigDecimal::add);
         this.shippingCost = shippingCost;
         this.vintageFees = products.stream()
@@ -44,13 +45,11 @@ public class Order {
     }
 
     private Order(Order other) {
-        this.id = nextAlphanumericId();
+        this.id = other.id;
         this.buyerId = other.buyerId;
         this.sellerId = other.sellerId;
         this.shippingCompanyId = other.shippingCompanyId;
-        this.products = other.products.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+        this.products = new HashMap<>(other.products);
         this.creationDate = other.creationDate;
         this.deliveryDateTime = other.deliveryDateTime;
         this.productsCost = other.productsCost;
@@ -88,16 +87,13 @@ public class Order {
         return status;
     }
 
-    public boolean wasReturned() {
-        return status == Status.RETURNED;
-    }
-
-    public boolean wasNotReturned() {
-        return status != Status.RETURNED;
-    }
-
     public String getShippingCompanyId() {
         return shippingCompanyId;
+    }
+
+    public String getSize() {
+        int numberOfProducts = products.size();
+        return numberOfProducts <= 5 ? numberOfProducts == 1 ? "small" : "medium" : "big";
     }
 
     public void expedite() throws StatusOrderException {
@@ -111,7 +107,7 @@ public class Order {
         if (status != Status.EXPEDITED) {
             throw new StatusOrderException("Trying to deliver " + status.name() + "order.\nOnly expedited orders can be delivered.");
         }
-        deliveryDateTime = LocalDateTime.now();
+        deliveryDateTime = LocalDateTime.now(TimeSimulation.getClock());
         status = Status.DELIVERED;
     }
 
@@ -119,10 +115,31 @@ public class Order {
         if (status != Status.DELIVERED) {
             throw new StatusOrderException("Trying to return " + status.name() + "order.\nOnly delivered orders can be returned.");
         }
-        if (deliveryDateTime.until(LocalDateTime.now(), ChronoUnit.HOURS) > 48) {
+        if (deliveryDateTime.until(LocalDateTime.now(TimeSimulation.getClock()), ChronoUnit.HOURS) > 48) {
             throw new LateReturnException("Trying to return order past return deadline.");
         }
         status = Status.RETURNED;
+    }
+
+    public boolean isInitialized() {
+        return status == Status.INITIALIZED;
+    }
+
+    public boolean isExpedited() {
+        return status == Status.EXPEDITED;
+    }
+
+    public boolean isDelivered() {
+        return status == Status.DELIVERED;
+    }
+
+    public boolean isReturned() {
+        return status == Status.RETURNED;
+    }
+
+    public boolean isReturnable() {
+        var twoDaysMillis = 172800000;
+        return status == Status.DELIVERED && creationDate.until(deliveryDateTime, ChronoUnit.MILLIS) < twoDaysMillis;
     }
 
     public BigDecimal totalCost() {

@@ -2,12 +2,13 @@ package model;
 
 import exceptions.ProductInCartUnavailable;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Vintage {
+public class Vintage implements Serializable {
     private final BigDecimal baseValueSmall;
     private final BigDecimal baseValueMedium;
     private final BigDecimal baseValueBig;
@@ -17,6 +18,18 @@ public class Vintage {
     private final Map<String, Order> orders;
     private final Map<String, ShippingCompany> shippingCompanies;
     private BigDecimal revenue;
+
+    public Vintage(BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal orderFee) {
+        this.baseValueSmall = baseValueSmall;
+        this.baseValueMedium = baseValueMedium;
+        this.baseValueBig = baseValueBig;
+        this.orderFee = orderFee;
+        this.products = new HashMap<>();
+        this.users = new HashMap<>();
+        this.orders = new LinkedHashMap<>();
+        this.shippingCompanies = new HashMap<>();
+        this.revenue = BigDecimal.ZERO;
+    }
 
     public Vintage(String baseValueSmall, String baseValueMedium, String baseValueBig, String orderFee) {
         this.baseValueSmall = new BigDecimal(baseValueSmall);
@@ -41,23 +54,72 @@ public class Vintage {
     }
 
     public void registerPremiumShippingCompany(String name, BigDecimal profitMargin, BigDecimal premiumTax) {
-        ShippingCompany newShippingCompany = new PremiumShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee,profitMargin, premiumTax);
+        ShippingCompany newShippingCompany = new PremiumShippingCompany(name, baseValueSmall, baseValueMedium, baseValueBig, orderFee, profitMargin, premiumTax);
         shippingCompanies.put(newShippingCompany.getId(), newShippingCompany);
     }
 
-    public void publishProduct(String userCode, Product product) {
-        Product productCopy = product.clone();
-        products.put(product.getId(), productCopy);
-        users.computeIfPresent(userCode, (k, v) -> {
-            v.addProductSelling(productCopy);
+    public void publishProduct(String userId, Product product) {
+        products.put(product.getId(), product);
+        users.computeIfPresent(userId, (k, v) -> {
+            v.addProductSelling(product);
             return v;
         });
     }
 
-    public void addProductToUserCart(String productCode, String userCode) {
-        if (products.containsKey(productCode) || users.containsKey(userCode)) {
-            users.get(userCode).addProductToCart(products.get(productCode));
+    public void addProductToUserCart(String userId, String productId) {
+        if (users.containsKey(userId) && products.containsKey(productId)) {
+            users.get(userId).addProductToCart(products.get(productId));
         }
+    }
+
+    public void removeProductFromUserCart(String userId, String productId) {
+        if (users.containsKey(userId) && products.containsKey(productId)) {
+            users.get(userId).removeProductFromCart(products.get(productId));
+        }
+    }
+
+    public List<Product> getProducts() {
+        return products.values().stream().toList();
+    }
+
+    public List<ShippingCompany> getShippingCompanies() {
+        return shippingCompanies.values().stream().map(ShippingCompany::clone).toList();
+    }
+
+    public Optional<String> getUserIdByEmail(String email) {
+        return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst().map(User::getId);
+    }
+
+    public Optional<User> getUser(String userId) {
+        return Optional.ofNullable(users.get(userId)).map(User::clone);
+    }
+
+    public Optional<String> getShippingCompanyIdByName(String name) {
+        return shippingCompanies.values()
+                .stream()
+                .filter(shippingCompany -> shippingCompany.getName().equals(name))
+                .findFirst()
+                .map(ShippingCompany::getId);
+    }
+
+    public List<Order> getShippingCompanyInitializedOrders(String shippingCompanyId) {
+        return shippingCompanies.get(shippingCompanyId).getInitializedOrders();
+    }
+
+    public List<Order> getShippingCompanyExpeditedOrders(String shippingCompanyId) {
+        return shippingCompanies.get(shippingCompanyId).getExpeditedOrders();
+    }
+
+    public List<Order> getUserReturnableOrders(String userId) {
+        return users.get(userId).getReturnableOrders();
+    }
+
+    public void deliverOrder(String orderId) {
+        orders.get(orderId).deliver();
+    }
+
+    public void expediteOrder(String orderId) {
+        orders.get(orderId).expedite();
     }
 
     public void orderUserCart(String buyerId) throws ProductInCartUnavailable {
@@ -84,7 +146,6 @@ public class Vintage {
 
         // generate and distribute orders
         cart.stream()
-                .map(Product::clone)
                 .collect(Collectors.groupingBy(p -> new SellerShippingCompanyPair(p.getSellerId(), p.getShippingCompanyId())))
                 .entrySet()
                 .stream()
@@ -124,11 +185,11 @@ public class Vintage {
         return users.get(userId).getOrdersMade().stream().map(Order::clone).toList();
     }
 
-    public List<User> topSellerInInterval(LocalDateTime from, LocalDateTime to) {
+    public List<User> topSellersInInterval(LocalDateTime from, LocalDateTime to) {
         return users.values().stream().sorted(Comparator.comparing(user -> user.getRevenue(from, to))).toList();
     }
 
-    public List<User> topBuyerInInterval(LocalDateTime from, LocalDateTime to) {
+    public List<User> topBuyersInInterval(LocalDateTime from, LocalDateTime to) {
         return users.values().stream().sorted(Comparator.comparing(user -> user.getSpending(from, to))).toList();
     }
 

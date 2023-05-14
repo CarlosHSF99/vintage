@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.time.temporal.ChronoUnit;
@@ -8,7 +9,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * Premium Sneaker class
  */
-public class PremiumSneaker extends Sneaker implements Premium {
+public class PremiumSneaker extends Sneaker implements Premium, Serializable {
     /**
      * Parameterized constructor.
      *
@@ -25,17 +26,8 @@ public class PremiumSneaker extends Sneaker implements Premium {
      * @param collectionYear         Sneaker collection year
      * @param appreciation           Sneaker appreciation defined by seller
      */
-    public PremiumSneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, String appreciation) {
+    public PremiumSneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, BigDecimal appreciation) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state, size, color, laces, collectionYear, appreciation);
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param other PremiumSneaker
-     */
-    public PremiumSneaker(Sneaker other) {
-        super(other);
     }
 
     /**
@@ -47,6 +39,6 @@ public class PremiumSneaker extends Sneaker implements Premium {
     @Override
     public BigDecimal priceCorrection() {
         return BigDecimal.ONE.add(getSellerPriceCorrection())
-                .pow((int) getCollectionYear().until(Year.now(), ChronoUnit.YEARS));
+                .pow((int) getCollectionYear().until(Year.now(TimeSimulation.getClock()), ChronoUnit.YEARS));
     }
 }

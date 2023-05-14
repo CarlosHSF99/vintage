@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Abstract product class.
  */
-public abstract class Product {
+public abstract class Product implements Serializable {
     private static long numberOfProducts = 0;
 
     private final String id;
@@ -37,22 +38,6 @@ public abstract class Product {
         this.basePrice = basePrice;
         this.numberOfPreviousOwners = numberOfPreviousOwners;
         this.state = state;
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param other Other Product
-     */
-    public Product(Product other) {
-        this.id = nextAlphanumericId();
-        this.sellerId = other.sellerId;
-        this.shippingCompanyId = other.shippingCompanyId;
-        this.description = other.description;
-        this.brand = other.brand;
-        this.basePrice = other.basePrice;
-        this.numberOfPreviousOwners = other.numberOfPreviousOwners;
-        this.state = other.state;
     }
 
     public String getId() {
@@ -126,6 +111,10 @@ public abstract class Product {
         return String.format("%8s", Long.toString(numberOfProducts++, 36)).replace(' ', '0');
     }
 
+    public String show() {
+        return state + ", Price: " + price() + ", " + brand + ", " + description + ", nº prev. owners: " + numberOfPreviousOwners;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -170,13 +159,10 @@ public abstract class Product {
         return result;
     }
 
-    @Override
-    public abstract Product clone();
-
     /**
      * State enum
      */
-    enum State {
+    public enum State {
         NEW_WITH_TAG("1.0"),
         NEW_WITHOUT_TAG("0.9"),
         VERY_GOOD("0.8"),

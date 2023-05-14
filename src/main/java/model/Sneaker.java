@@ -1,18 +1,19 @@
 package model;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Year;
 
 /**
  * Sneaker class
  */
-public class Sneaker extends Product {
-    private int size;
-    private Color color;
-    private boolean laces;
-    private Year collectionYear;
-    private BigDecimal sellerPriceCorrection;
+public class Sneaker extends Product implements Serializable {
+    private final int size;
+    private final Color color;
+    private final boolean laces;
+    private final Year collectionYear;
+    private final BigDecimal sellerPriceCorrection;
 
     /**
      * Parameterized constructor
@@ -30,27 +31,13 @@ public class Sneaker extends Product {
      * @param collectionYear         Sneaker collection year
      * @param discount               Sneaker discount defined by seller
      */
-    public Sneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, String discount) {
+    public Sneaker(String sellerId, String shippingCompanyId, String description, String brand, BigDecimal basePrice, int numberOfPreviousOwners, State state, int size, Color color, boolean laces, Year collectionYear, BigDecimal discount) {
         super(sellerId, shippingCompanyId, description, brand, basePrice, numberOfPreviousOwners, state);
         this.size = size;
         this.color = color;
         this.laces = laces;
         this.collectionYear = collectionYear;
-        this.sellerPriceCorrection = new BigDecimal(discount);
-    }
-
-    /**
-     * Copy constructor
-     *
-     * @param other Other Sneaker
-     */
-    public Sneaker(Sneaker other) {
-        super(other);
-        this.size = other.size;
-        this.color = other.color;
-        this.laces = other.laces;
-        this.collectionYear = other.collectionYear;
-        this.sellerPriceCorrection = other.sellerPriceCorrection;
+        this.sellerPriceCorrection = discount;
     }
 
     public int getSize() {
@@ -81,6 +68,11 @@ public class Sneaker extends Product {
      */
     public BigDecimal priceCorrection() {
         return isUsed() || size > 45 ? BigDecimal.ONE.subtract(sellerPriceCorrection) : BigDecimal.ONE;
+    }
+
+    @Override
+    public String show() {
+        return "Sneaker, " + super.show() + ", Size: " + size + ", Color: " + String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue()) + ", " + (laces ? "has" : "no") + " laces, Collection year: " + collectionYear;
     }
 
     @Override
@@ -119,10 +111,5 @@ public class Sneaker extends Product {
         result = 31 * result + collectionYear.hashCode();
         result = 31 * result + sellerPriceCorrection.hashCode();
         return result;
-    }
-
-    @Override
-    public Sneaker clone() {
-        return new Sneaker(this);
     }
 }

@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class PremiumShippingCompany extends ShippingCompany implements Premium {
+public class PremiumShippingCompany extends ShippingCompany implements Premium, Serializable {
     private BigDecimal premiumTax;
 
     public PremiumShippingCompany(String name, BigDecimal baseValueSmall, BigDecimal baseValueMedium, BigDecimal baseValueBig, BigDecimal fee, BigDecimal profitMargin, BigDecimal premiumTax) {

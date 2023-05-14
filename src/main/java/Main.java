@@ -1,7 +1,7 @@
-import controller.Controller;
+import controllerView.ControllerView;
 
 public class Main {
     public static void main(String[] args) {
-        new Controller().run();
+        new ControllerView().run();
     }
 }

@@ -110,6 +110,10 @@ public class Vintage implements Serializable {
         return shippingCompanies.get(shippingCompanyId).getExpeditedOrders();
     }
 
+    public void setShippingCompanyProfitMargin(String shippingCompanyId, BigDecimal profitMargin) {
+        shippingCompanies.get(shippingCompanyId).setProfitMargin(profitMargin);
+    }
+
     public List<Order> getUserReturnableOrders(String userId) {
         return users.get(userId).getReturnableOrders();
     }
